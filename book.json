@@ -1,0 +1,33 @@
+{
+    "plugins": [
+      "flexible-alerts"
+    ],
+  
+    "pluginsConfig": {
+      "flexible-alerts": {
+            "style": "flat",
+            "note": {
+              "label": "提示"
+            },
+            "tip": {
+              "label": "Tip"
+            },
+            "warning": {
+              "label": "警告！"
+            },
+            "danger": {
+              "label": "重要提示！！！"
+            },
+          "question": {
+              "label": "思考与解答",
+              "icon": "fa fa-question-circle",
+              "className": "info"
+          },
+          "hw": {
+              "label": "题目",
+              "icon": "fa fa-comments",
+              "className": "info"
+          }
+      }
+    }
+  }

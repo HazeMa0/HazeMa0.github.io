@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "gitbook-plugin-alerts": "^0.2.0",
+    "gitbook-plugin-flexible-alerts": "^1.0.4"
+  }
+}
