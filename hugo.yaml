@@ -2,3 +2,40 @@ baseURL: https://hazema0.github.io/
 languageCode: zh-cn
 title: Haze 的记事本
 theme: ["PaperMod"]
+
+params:
+  defaultTheme: auto # to switch between dark or light according to browser theme
+  ShowPostNavLinks: true
+  ShowCodeCopyButtons: true
+  
+  homeInfoParams:
+    Title: 共同进步！
+    Content: 心有所向，日复一日，必有精进。
+  socialIcons:
+    - name: "GitHub"
+      url: "https://github.com/HazeMa0"
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON # necessary for search
+
+languages:
+  en:
+    languageName: "English"
+    weight: 1
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: 存档
+          url: archives/
+          weight: 1
+        - name: 标签
+          url: tags/
+          weight: 2
+        - name: 搜索
+          url: search/
+          weight: 3

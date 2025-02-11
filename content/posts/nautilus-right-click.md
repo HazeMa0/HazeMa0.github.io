@@ -1,6 +1,5 @@
 ---
 date: '2025-02-11T16:36:29+08:00'
-draft: false
 title: '如何为 nautilus 配置右键菜单'
 summary: 'nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。'
 ---

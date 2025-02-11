@@ -2,17 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>http://localhost:1313/</loc>
+    <loc>https://hazema0.github.io/</loc>
+    <lastmod>2025-02-11T17:56:58+08:00</lastmod>
+  </url><url>
+    <loc>https://hazema0.github.io/posts/</loc>
+    <lastmod>2025-02-11T17:56:58+08:00</lastmod>
+  </url><url>
+    <loc>https://hazema0.github.io/posts/nautilus-new-file/</loc>
+    <lastmod>2025-02-11T17:56:58+08:00</lastmod>
+  </url><url>
+    <loc>https://hazema0.github.io/posts/nautilus-right-click/</loc>
     <lastmod>2025-02-11T16:36:29+08:00</lastmod>
   </url><url>
-    <loc>http://localhost:1313/posts/</loc>
-    <lastmod>2025-02-11T16:36:29+08:00</lastmod>
+    <loc>https://hazema0.github.io/categories/</loc>
   </url><url>
-    <loc>http://localhost:1313/posts/hello-blog/</loc>
-    <lastmod>2025-02-11T16:36:29+08:00</lastmod>
+    <loc>https://hazema0.github.io/series/</loc>
   </url><url>
-    <loc>http://localhost:1313/categories/</loc>
+    <loc>https://hazema0.github.io/archives/</loc>
   </url><url>
-    <loc>http://localhost:1313/tags/</loc>
+    <loc>https://hazema0.github.io/search/</loc>
+  </url><url>
+    <loc>https://hazema0.github.io/tags/</loc>
   </url>
 </urlset>
