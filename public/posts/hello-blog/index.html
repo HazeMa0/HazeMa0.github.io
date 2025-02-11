@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="noindex, nofollow">
+<title>如何为 nautilus 配置右键菜单 | Haze 的记事本</title>
+<meta name="keywords" content="">
+<meta name="description" content="nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。">
+<meta name="author" content="">
+<link rel="canonical" href="http://localhost:1313/posts/hello-blog/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/hello-blog/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="http://localhost:1313/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      如何为 nautilus 配置右键菜单
+    </h1>
+    <div class="post-meta"><span title='2025-02-11 16:36:29 +0800 CST'>February 11, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><blockquote>
+<p><strong>相关软件版本</strong></p>
+<ul>
+<li>Ubuntu 22.04 及以上</li>
+</ul></blockquote>
+<p>nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。</p>
+<p>本来其实没想到这样一个简单的任务会引起一些麻烦。把我处理这个麻烦的过程记下来吧。</p>
+<p>首先，我们百度搜索这个问题，从一些相当新的帖子获得的解决方案是安装 <code>nautilus-actions</code>。但意外的是，在 Ubuntu 22.04 中，这个包被移除了。</p>
+<p>我们转战谷歌，找到了<a href="https://askubuntu.com/questions/1405687/how-to-install-filemanager-actions-in-ubuntu-22-04">这篇帖子</a>，告诉我们这个软件因为缺少更新已经被上游的 gnome <a href="https://gitlab.gnome.org/Infrastructure/Infrastructure/-/issues/671">存档</a>了。我们也并不想使用已经被废弃的软件，那就去找替代方案吧——我相信不可能没有提供。</p>
+<p><em>意外发现：gnome 原来用 gitlab 管理项目，有趣。</em></p>
+<p><em>翻译者没有兴趣维护这个软件：&ldquo;Sorry, but if there&rsquo;s no contributions for several years, we&rsquo;re not going to keep it active. It wastes the efforts of our translators. Feel free to fork and maintain it somewhere else if you like (it&rsquo;s open source, after all).&rdquo;</em></p>
+<p><a href="https://www.reddit.com/r/gnome/comments/rf0leo/is_there_a_replacement_for_nautilusactions/?rdt=61801">另一篇帖子</a> 指出了两个替代方案：一个是我在以前使用过的 <a href="https://help.ubuntu.com/community/NautilusScriptsHowto"><code>Nautilus Scripts</code></a>，最终效果是在右键菜单里面显示一个 Scripts 子菜单，里面有我们写好的脚本作为选项。这种方法不够优雅，我们希望显示在主右键菜单里面；另一个是 <a href="https://gitlab.gnome.org/GNOME/nautilus-python/"><code>nautilus-python</code></a>，出于对 python 的好感我们最终选择这个方案。</p>
+<p>问题又来了，在 Ubuntu 安装 <code>nautilus-python</code>，也没有这个包。经过检查，<a href="https://github.com/GSConnect/gnome-shell-extension-gsconnect/issues/1389">一篇帖子</a> 指出其在 Ubuntu 源的名称是 <code>python3-nautilus</code>，这可能是因为一些误解产生的问题。</p>
+<p>现在我们学习写 python 代码来实现 nautilus-python 的扩展。参考资源：<a href="https://gitlab.gnome.org/GNOME/nautilus-python/-/tree/master/examples?ref_type=heads">官方示例</a>、<a href="https://linuxconfig.org/how-to-write-nautilus-extensions-with-nautilus-python">linuxconfig.org 的教程</a>。我们将写好的 python 文件保存到 <code>~/.local/share/nautilus-python/extensions/</code> 即可，然后重启 nautilus 即可。</p>
+<p>先看下面的示例，其为 VSCode 打开文件夹和文件提供了右键菜单（使用命令 <code>wget -qO- https://raw.githubusercontent.com/harry-cpp/code-nautilus/master/install.sh | bash</code> 以快速安装，我对代码做了一些简化，原本的源代码请参考相应的 <a href="https://github.com/harry-cpp/code-nautilus">GitHub 仓库</a>）：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#f92672">from</span> gi.repository <span style="color:#f92672">import</span> Nautilus, GObject
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> subprocess <span style="color:#f92672">import</span> call
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> os
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">VSCodeExtension</span>(GObject<span style="color:#f92672">.</span>GObject, Nautilus<span style="color:#f92672">.</span>MenuProvider):
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e"># python 支持多重继承</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">launch_vscode</span>(self, menu, files):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 参数是 self, menu, files，注意不要修改</span>
+</span></span><span style="display:flex;"><span>        safepaths <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        args <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;&#39;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> file <span style="color:#f92672">in</span> files:
+</span></span><span style="display:flex;"><span>            filepath <span style="color:#f92672">=</span> file<span style="color:#f92672">.</span>get_location()<span style="color:#f92672">.</span>get_path()
+</span></span><span style="display:flex;"><span>            safepaths <span style="color:#f92672">+=</span> <span style="color:#e6db74">&#39;&#34;&#39;</span> <span style="color:#f92672">+</span> filepath <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&#34; &#39;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>isdir(filepath) <span style="color:#f92672">and</span> os<span style="color:#f92672">.</span>path<span style="color:#f92672">.</span>exists(filepath):
+</span></span><span style="display:flex;"><span>                args <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;--new-window &#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        call(<span style="color:#e6db74">&#39;code &#39;</span> <span style="color:#f92672">+</span> args <span style="color:#f92672">+</span> safepaths <span style="color:#f92672">+</span> <span style="color:#e6db74">&#39;&amp;&#39;</span>, shell<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_file_items</span>(self, <span style="color:#f92672">*</span>args):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 右键文件/文件夹时对应的方法</span>
+</span></span><span style="display:flex;"><span>        files <span style="color:#f92672">=</span> args[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        item <span style="color:#f92672">=</span> Nautilus<span style="color:#f92672">.</span>MenuItem(
+</span></span><span style="display:flex;"><span>            name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;VSCodeOpen&#39;</span>,
+</span></span><span style="display:flex;"><span>            label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Open in Code&#39;</span>,
+</span></span><span style="display:flex;"><span>            tip<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Opens the selected files with VSCode&#39;</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        item<span style="color:#f92672">.</span>connect(<span style="color:#e6db74">&#39;activate&#39;</span>, self<span style="color:#f92672">.</span>launch_vscode, files)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> [item]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_background_items</span>(self, <span style="color:#f92672">*</span>args):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 右键空白位置时的方法</span>
+</span></span><span style="display:flex;"><span>        file_ <span style="color:#f92672">=</span> args[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>        item <span style="color:#f92672">=</span> Nautilus<span style="color:#f92672">.</span>MenuItem(
+</span></span><span style="display:flex;"><span>            name<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;VSCodeOpenBackground&#39;</span>,
+</span></span><span style="display:flex;"><span>            label<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Open in Code&#39;</span>,
+</span></span><span style="display:flex;"><span>            tip<span style="color:#f92672">=</span><span style="color:#e6db74">&#39;Opens the current directory in VSCode&#39;</span>
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        item<span style="color:#f92672">.</span>connect(<span style="color:#e6db74">&#39;activate&#39;</span>, self<span style="color:#f92672">.</span>launch_vscode, [file_])
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> [item]
+</span></span></code></pre></div><p>上面的 python 代码足够直观了。<code>get_backgroud_items</code> 和 <code>get_file_items</code> 返回一个菜单数组，而菜单如何创建和与具体的操作方法链接上面的示例已经足够说明。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="http://localhost:1313/">Haze 的记事本</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+</body>
+
+</html>
