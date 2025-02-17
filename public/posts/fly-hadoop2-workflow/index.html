@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来 | Haze 的记事本</title>
+<meta name="keywords" content="">
+<meta name="description" content="项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借助 Docker 和 Dev Container，舒适地开发老旧框架的程序。本文阐述了这个项目中遇到的困难。">
+<meta name="author" content="">
+<link rel="canonical" href="https://hazema0.github.io/posts/fly-hadoop2-workflow/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9de45e225101e4f99701d2b68fc6b8a1ef6027928be6391fa15bf7f56326c909.css" integrity="sha256-neReIlEB5PmXAdK2j8a4oe9gJ5KL5jkfoVv39WMmyQk=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://hazema0.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hazema0.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hazema0.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://hazema0.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://hazema0.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://hazema0.github.io/posts/fly-hadoop2-workflow/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://hazema0.github.io/posts/fly-hadoop2-workflow/">
+  <meta property="og:site_name" content="Haze 的记事本">
+  <meta property="og:title" content="fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来">
+  <meta property="og:description" content="项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借助 Docker 和 Dev Container，舒适地开发老旧框架的程序。本文阐述了这个项目中遇到的困难。">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-02-17T19:51:04+08:00">
+    <meta property="article:modified_time" content="2025-02-17T19:51:04+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来">
+<meta name="twitter:description" content="项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借助 Docker 和 Dev Container，舒适地开发老旧框架的程序。本文阐述了这个项目中遇到的困难。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://hazema0.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来",
+      "item": "https://hazema0.github.io/posts/fly-hadoop2-workflow/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来",
+  "name": "fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来",
+  "description": "项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借助 Docker 和 Dev Container，舒适地开发老旧框架的程序。本文阐述了这个项目中遇到的困难。",
+  "keywords": [
+    
+  ],
+  "articleBody": "项目地址（配有使用方法）：https://github.com/HazeMa0/fly-hadoop2-workflow\n作为博客，还是整理一下这个过程中的困难吧。\n1 网络问题很烦人 首先，事实是：2024 年，中国大陆的主要高校和云服务商都关闭了 Docker Hub 的镜像源。但是百度仍有大量的帖子在建议更换镜像源以改善对 Docker Hub 的访问。\n我在我的 Windows 环境部署了代理。WSL2 理应继承代理设置。但是神奇的事情发生了：WSL2 我们可以顺利地 docker build，Windows 却不行。\n然后，我们做了以下事情试图让 Dockerfile 的 from 指令正常工作：\n设置 HTTP_PROXY 和 HTTPS_PROXY 环境变量； 注意！\nHTTPS_PROXY 对应的仍然是 http://localhost:1234，而不是 https！我是在发现环境变量使我的 VSCode 无法正常工作时才发现这个问题的；\n配置 Docker Engine 的配置文件： \"proxies\": { \"default\": { \"httpProxy\": \"http://127.0.0.1:9870\", \"httpsProxy\": \"http://127.0.0.1:9870\", \"noProxy\": \"localhost,127.0.0.1\" } } 修改 ~/.docker/config.json（最后又删掉了） 在我没发现我把 HTTPS_PROXY 写成 https://… 时，这三个修改都不起作用。然后，在一次神秘的 docker pull ... 后，突然就好起来了，我至今也没搞清楚到底是怎么回事。\n我们认识到，ping 命令走的是 ICMP 协议，对测试 http/socks5 的代理没有意义。 2 对 Docker 和 Dev Container 的错误理解 刚开始，我们在使用 Docker 运行和使用 Dev Container 作为开发环境上犹豫和摇摆了很长时间。我问了 AI 下面这一大段文字，可见我当时的烦躁。\n我现在陷入了一些混乱，需要你来拯救我。要写代码，首先要有开发环境。一般来说，这意味着编译器和解释器以及外部库和系统库的版本，还有代码构建工具的版本。这些东西在不同的开发项目中很容易冲突。然后我们运行起来了程序。然后希望交给测试测试。我没有在公司工作过，我不知道测试测试时需不需要源代码，还是只拿最终可执行程序进行测试。如果需要，那他也需要开发环境。然后经过修改，最后交付用户。用户不同软件之间的运行环境也可能冲突，一般来说，运行环境应该是开发环境的一个子集。容器要怎么终结这一系列混乱？\n好了，现在产生了问题。首先开发者要搭建一个叫做开发环境的玩意。把编译器/解释器/代码生成程序/外部库/系统库封装在容器里面是很好，问题是本地运行的IDE怎么和这些容器里面的玩意交互，从而支持语法高亮和其他功能呢？其次，我说了，运行环境往往是开发环境的子集，编译器对运行环境毫无必要。难道容器通过纵容这些冗余来换取分发效率吗？还有，为什么现实中面向普通用户的应用没有一个用docker分发呢？\n产生这些困惑的 Docker 相关问题是：\n以为代码的依赖都在容器里面，不希望手动把依赖拷到物理机恶心自己。虽然我们确实可以在容器里面援引相关的 jar，但更方便的方法是直接在本地通过 Maven 从中心仓库部署合适的依赖用于测试。 不了解容器挂载技术，以为我们必须手动把 jar 文件拷贝到容器测试。 不了解本地测试 Hadoop，以为所有类型的测试必须使用 hadoop jar 命令执行。实际上我们甚至可以不启动容器进行本地测试，完全本地开发。 区分不了镜像和容器。镜像是死的初始化状态，容器是基于镜像的可工作的实体。Dockerfile 产生镜像。 过早把自己摆到用户角度，认为开发环境对运行环境是冗余的（冗余了你改改 Dockerfile 不就行了吗，对刚开始的我来说改这玩意很困难，现在完全不是了） Dev Container 相关问题是：\n神圣化 Dev Container，以为其不会往容器里面部署 IDE 后端，从而产生了一系列矛盾； 以为 Dev Container 不能配置容器开放的端口。同时认识到，不能修改一个已经打开的容器的端口映射，这是为了简化容器运行状态故意为之的设计。 Dev Container 指定 entrypoint 不是在 postCreateCommand，也不是在 Dockerfile，只有通过 runArgs 指定才是正确的。 不知道为什么，让 Dev Container 执行我的脚本时不能正确识别 echo 的 -e 参数，而是将其作为文本打印。最后我们换用了 printf 命令。 一些 linux 知识 Hadoop 环境初始化脚本需要 ssh 连接，就会产生下面这种需要手动确认的麻烦问题： yes：The authenticity of host 'localhost (::1)' can't be established. ECDSA key fingerprint is SHA256:**********.\rAre you sure you want to continue connecting (yes/no)? 我们希望初始化脚本作为 Docker 的 1 号进程，当然不希望这种需要手工确认的东西出现。我们最终使用以下脚本解决：\ntouch ~/.ssh/config printf \"Host *\\n\\tStrictHostKeyChecking no\\n\\tUserKnownHostsFile /dev/null\\n\" \u003e ~/.ssh/config 该死的 \\r\\n 在 Windows，git 默认会把 \\n 替换成 \\r\\n。这最后导致我的脚本 push 再 clone 后竟然无法运行了。最后一行命令解决问题： git config --global core.autocrlf false 有趣的事实：JDK 1.x == JDK x 2. 该死的讲义问题 讲义给出的一些命令根本是错误的。\n讲义没有细说应该怎么修改 Hadoop 的若干 xml，百度也在画蛇添足。只有官方文档才是可靠的。\n讲义没告诉我 start-all.sh 的正确位置，让我无法正确配置 PATH。\n鸣谢 感谢 DeepSeek 和 ChatGPT 耐心地听我抱怨和提出问题。没有任何一个人类受得了这么多怨气和不满。\n感谢官方的 Hadoop 安装教程。\n感谢 Google。珍爱生命，拒绝百度。\n",
+  "wordCount" : "226",
+  "inLanguage": "en",
+  "datePublished": "2025-02-17T19:51:04+08:00",
+  "dateModified": "2025-02-17T19:51:04+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://hazema0.github.io/posts/fly-hadoop2-workflow/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Haze 的记事本",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://hazema0.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://hazema0.github.io/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://hazema0.github.io/archives/" title="存档">
+                    <span>存档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hazema0.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hazema0.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来
+    </h1>
+    <div class="post-meta"><span title='2025-02-17 19:51:04 +0800 CST'>February 17, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>项目地址（配有使用方法）：<a href="https://github.com/HazeMa0/fly-hadoop2-workflow">https://github.com/HazeMa0/fly-hadoop2-workflow</a></p>
+<p>作为博客，还是整理一下这个过程中的困难吧。</p>
+<h2 id="1-网络问题很烦人">1 网络问题很烦人<a hidden class="anchor" aria-hidden="true" href="#1-网络问题很烦人">#</a></h2>
+<ol>
+<li>
+<p>首先，事实是：2024 年，中国大陆的主要高校和云服务商都关闭了 Docker Hub 的镜像源。但是百度仍有大量的帖子在建议更换镜像源以改善对 Docker Hub 的访问。</p>
+</li>
+<li>
+<p>我在我的 Windows 环境部署了代理。WSL2 理应继承代理设置。但是神奇的事情发生了：WSL2 我们可以顺利地 <code>docker build</code>，Windows 却不行。</p>
+</li>
+</ol>
+<p>然后，我们做了以下事情试图让 Dockerfile 的 from 指令正常工作：</p>
+<ul>
+<li>设置 HTTP_PROXY 和 HTTPS_PROXY 环境变量；</li>
+</ul>
+<blockquote>
+<p><strong>注意！</strong></p>
+<p>HTTPS_PROXY 对应的仍然是 http://localhost:1234，而不是 https！我是在发现环境变量使我的 VSCode 无法正常工作时才发现这个问题的；</p></blockquote>
+<ul>
+<li>配置 Docker Engine 的配置文件：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#e6db74">&#34;proxies&#34;</span><span style="color:#960050;background-color:#1e0010">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;default&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;httpProxy&#34;</span>: <span style="color:#e6db74">&#34;http://127.0.0.1:9870&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;httpsProxy&#34;</span>: <span style="color:#e6db74">&#34;http://127.0.0.1:9870&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">&#34;noProxy&#34;</span>: <span style="color:#e6db74">&#34;localhost,127.0.0.1&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><ul>
+<li>修改 <code>~/.docker/config.json</code>（最后又删掉了）</li>
+</ul>
+<p>在我没发现我把 HTTPS_PROXY 写成 https://&hellip; 时，这三个修改都不起作用。然后，在一次神秘的 <code>docker pull ...</code> 后，突然就好起来了，我至今也没搞清楚到底是怎么回事。</p>
+<ol start="3">
+<li>我们认识到，<code>ping</code> 命令走的是 ICMP 协议，对测试 http/socks5 的代理没有意义。</li>
+</ol>
+<h2 id="2-对-docker-和-dev-container-的错误理解">2 对 Docker 和 Dev Container 的错误理解<a hidden class="anchor" aria-hidden="true" href="#2-对-docker-和-dev-container-的错误理解">#</a></h2>
+<p>刚开始，我们在使用 Docker 运行和使用 Dev Container 作为开发环境上犹豫和摇摆了很长时间。我问了 AI 下面这一大段文字，可见我当时的烦躁。</p>
+<p><em>我现在陷入了一些混乱，需要你来拯救我。要写代码，首先要有开发环境。一般来说，这意味着编译器和解释器以及外部库和系统库的版本，还有代码构建工具的版本。这些东西在不同的开发项目中很容易冲突。然后我们运行起来了程序。然后希望交给测试测试。我没有在公司工作过，我不知道测试测试时需不需要源代码，还是只拿最终可执行程序进行测试。如果需要，那他也需要开发环境。然后经过修改，最后交付用户。用户不同软件之间的运行环境也可能冲突，一般来说，运行环境应该是开发环境的一个子集。容器要怎么终结这一系列混乱？</em></p>
+<p><em>好了，现在产生了问题。首先开发者要搭建一个叫做开发环境的玩意。把编译器/解释器/代码生成程序/外部库/系统库封装在容器里面是很好，问题是本地运行的IDE怎么和这些容器里面的玩意交互，从而支持语法高亮和其他功能呢？其次，我说了，运行环境往往是开发环境的子集，编译器对运行环境毫无必要。难道容器通过纵容这些冗余来换取分发效率吗？还有，为什么现实中面向普通用户的应用没有一个用docker分发呢？</em></p>
+<p>产生这些困惑的 Docker 相关问题是：</p>
+<ol>
+<li>以为代码的依赖都在容器里面，不希望手动把依赖拷到物理机恶心自己。虽然我们确实可以在容器里面援引相关的 jar，但更方便的方法是直接在本地通过 Maven 从中心仓库部署合适的依赖用于测试。</li>
+<li>不了解容器挂载技术，以为我们必须手动把 jar 文件拷贝到容器测试。</li>
+<li>不了解本地测试 Hadoop，以为所有类型的测试必须使用 <code>hadoop jar</code> 命令执行。实际上我们甚至可以不启动容器进行本地测试，完全本地开发。</li>
+<li>区分不了镜像和容器。镜像是死的初始化状态，容器是基于镜像的可工作的实体。Dockerfile 产生镜像。</li>
+<li>过早把自己摆到用户角度，认为开发环境对运行环境是冗余的（冗余了你改改 Dockerfile 不就行了吗，对刚开始的我来说改这玩意很困难，现在完全不是了）</li>
+</ol>
+<p>Dev Container 相关问题是：</p>
+<ol>
+<li>神圣化 Dev Container，以为其不会往容器里面部署 IDE 后端，从而产生了一系列矛盾；</li>
+<li>以为 Dev Container 不能配置容器开放的端口。同时认识到，不能修改一个已经打开的容器的端口映射，这是为了简化容器运行状态故意为之的设计。</li>
+<li>Dev Container 指定 entrypoint 不是在 postCreateCommand，也不是在 Dockerfile，只有通过 <code>runArgs</code> 指定才是正确的。</li>
+<li>不知道为什么，让 Dev Container 执行我的脚本时不能正确识别 echo 的 -e 参数，而是将其作为文本打印。最后我们换用了 printf 命令。</li>
+</ol>
+<h2 id="一些-linux-知识">一些 linux 知识<a hidden class="anchor" aria-hidden="true" href="#一些-linux-知识">#</a></h2>
+<ol>
+<li>Hadoop 环境初始化脚本需要 ssh 连接，就会产生下面这种需要手动确认的麻烦问题：</li>
+</ol>
+<pre tabindex="0"><code>yes：The authenticity of host &#39;localhost (::1)&#39; can&#39;t be established. 
+ECDSA key fingerprint is SHA256:**********.
+Are you sure you want to continue connecting (yes/no)? 
+</code></pre><p>我们希望初始化脚本作为 Docker 的 1 号进程，当然不希望这种需要手工确认的东西出现。我们最终使用以下脚本解决：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-sh" data-lang="sh"><span style="display:flex;"><span>touch ~/.ssh/config
+</span></span><span style="display:flex;"><span>printf <span style="color:#e6db74">&#34;Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n&#34;</span> &gt; ~/.ssh/config
+</span></span></code></pre></div><ol start="2">
+<li>该死的 <code>\r\n</code>
+在 Windows，git 默认会把 <code>\n</code> 替换成 <code>\r\n</code>。这最后导致我的脚本 push 再 clone 后竟然无法运行了。最后一行命令解决问题：</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-powershell" data-lang="powershell"><span style="display:flex;"><span>git config --global core.autocrlf false
+</span></span></code></pre></div><ol start="3">
+<li>有趣的事实：JDK 1.x == JDK x</li>
+</ol>
+<h2 id="2-该死的讲义问题">2. 该死的讲义问题<a hidden class="anchor" aria-hidden="true" href="#2-该死的讲义问题">#</a></h2>
+<ol>
+<li>
+<p>讲义给出的一些命令根本是错误的。</p>
+</li>
+<li>
+<p>讲义没有细说应该怎么修改 Hadoop 的若干 xml，百度也在画蛇添足。只有官方文档才是可靠的。</p>
+</li>
+<li>
+<p>讲义没告诉我 start-all.sh 的正确位置，让我无法正确配置 PATH。</p>
+</li>
+</ol>
+<h2 id="鸣谢">鸣谢<a hidden class="anchor" aria-hidden="true" href="#鸣谢">#</a></h2>
+<p>感谢 DeepSeek 和 ChatGPT 耐心地听我抱怨和提出问题。没有任何一个人类受得了这么多怨气和不满。</p>
+<p>感谢官方的 <a href="https://hadoop.apache.org/docs/stable/hadoop-project-dist/hadoop-common/SingleCluster.html">Hadoop 安装教程</a>。</p>
+<p>感谢 Google。珍爱生命，拒绝百度。</p>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://hazema0.github.io/posts/nautilus-new-file/">
+    <span class="title">Next »</span>
+    <br>
+    <span>如何为 nautilus 右键菜单添加新建文件选项</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://hazema0.github.io/">Haze 的记事本</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

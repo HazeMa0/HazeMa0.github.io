@@ -6,8 +6,15 @@
     <description>Recent content on Haze 的记事本</description>
     <generator>Hugo -- 0.143.1</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 11 Feb 2025 17:56:58 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 17 Feb 2025 19:51:04 +0800</lastBuildDate>
     <atom:link href="https://hazema0.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来</title>
+      <link>https://hazema0.github.io/posts/fly-hadoop2-workflow/</link>
+      <pubDate>Mon, 17 Feb 2025 19:51:04 +0800</pubDate>
+      <guid>https://hazema0.github.io/posts/fly-hadoop2-workflow/</guid>
+      <description>项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借助 Docker 和 Dev Container，舒适地开发老旧框架的程序。本文阐述了这个项目中遇到的困难。</description>
+    </item>
     <item>
       <title>如何为 nautilus 右键菜单添加新建文件选项</title>
       <link>https://hazema0.github.io/posts/nautilus-new-file/</link>
