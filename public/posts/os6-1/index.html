@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="noindex, nofollow">
-<title>如何为 nautilus 右键菜单添加新建文件选项 | Haze 的记事本</title>
+<title>操作系统复习·堆分配 | Haze 的记事本</title>
 <meta name="keywords" content="">
-<meta name="description" content="为 nautilus 添加新建选项的菜单并不困难。因为 ~/Templates 就是专门为之服务的。">
+<meta name="description" content="无论是操作系统还是 malloc 库，无论是单核 CPU 还是多核 CPU，堆分配都是操作系统实现和改良的核心话题之一。">
 <meta name="author" content="">
-<link rel="canonical" href="http://localhost:1313/posts/nautilus-new-file/">
+<link rel="canonical" href="http://localhost:1313/posts/os6-1/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
 <link rel="icon" href="http://localhost:1313/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
@@ -18,7 +18,7 @@
 <link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/nautilus-new-file/">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/os6-1/">
 <noscript>
     <style>
         #theme-toggle,
@@ -122,23 +122,14 @@
   <header class="post-header">
     
     <h1 class="post-title entry-hint-parent">
-      如何为 nautilus 右键菜单添加新建文件选项
+      操作系统复习·堆分配
     </h1>
-    <div class="post-meta"><span title='2025-02-11 17:56:58 +0800 CST'>February 11, 2025</span>
+    <div class="post-meta"><span title='2025-03-23 18:00:00 +0800 CST'>March 23, 2025</span>
 
 </div>
   </header> 
   <div class="post-content"><blockquote>
-<p><strong>相关软件（不限版本）</strong></p>
-<ul>
-<li>nautilus</li>
-</ul></blockquote>
-<p>刚装好 Ubuntu，我们在文件管理器的右键菜单里面找不到新建文件的选项，这确实很让人匪夷所思。</p>
-<p>实际上，我们只需要在 <code>~/Templates</code> 新建一个模板就好。</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>$ cd ~/Templates
-</span></span><span style="display:flex;"><span>$ touch <span style="color:#e6db74">`</span>TXT.txt<span style="color:#e6db74">`</span>
-</span></span><span style="display:flex;"><span>$ touch <span style="color:#e6db74">`</span>Markdown.md<span style="color:#e6db74">`</span>
-</span></span></code></pre></div><p>当然这个方案并不完美，就是并没有在新建文件后自动处于重命名状态的功能。</p>
+<p>学而不思则罔，思而不学则殆。</p></blockquote>
 
 
   </div>
@@ -147,15 +138,10 @@
     <ul class="post-tags">
     </ul>
 <nav class="paginav">
-  <a class="prev" href="http://localhost:1313/posts/fly-hadoop2-workflow/">
-    <span class="title">« Prev</span>
-    <br>
-    <span>fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来</span>
-  </a>
-  <a class="next" href="http://localhost:1313/posts/nautilus-right-click/">
+  <a class="next" href="http://localhost:1313/posts/os6-0/">
     <span class="title">Next »</span>
     <br>
-    <span>如何为 nautilus 配置右键菜单</span>
+    <span>操作系统复习·前言</span>
   </a>
 </nav>
 

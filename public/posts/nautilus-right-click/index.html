@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><meta charset="utf-8">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="noindex, nofollow">
 <title>如何为 nautilus 配置右键菜单 | Haze 的记事本</title>
 <meta name="keywords" content="">
 <meta name="description" content="nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。">
 <meta name="author" content="">
-<link rel="canonical" href="https://hazema0.github.io/posts/nautilus-right-click/">
+<link rel="canonical" href="http://localhost:1313/posts/nautilus-right-click/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.45e028aa8ce0961349adf411b013ee39406be2c0bc80d4ea3fc04555f7f4611a.css" integrity="sha256-ReAoqozglhNJrfQRsBPuOUBr4sC8gNTqP8BFVff0YRo=" rel="preload stylesheet" as="style">
-<link rel="icon" href="https://hazema0.github.io/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="https://hazema0.github.io/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="https://hazema0.github.io/favicon-32x32.png">
-<link rel="apple-touch-icon" href="https://hazema0.github.io/apple-touch-icon.png">
-<link rel="mask-icon" href="https://hazema0.github.io/safari-pinned-tab.svg">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:1313/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="https://hazema0.github.io/posts/nautilus-right-click/">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/posts/nautilus-right-click/">
 <noscript>
     <style>
         #theme-toggle,
@@ -55,69 +55,7 @@
         }
 
     </style>
-</noscript><meta property="og:url" content="https://hazema0.github.io/posts/nautilus-right-click/">
-  <meta property="og:site_name" content="Haze 的记事本">
-  <meta property="og:title" content="如何为 nautilus 配置右键菜单">
-  <meta property="og:description" content="nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。">
-  <meta property="og:locale" content="en">
-  <meta property="og:type" content="article">
-    <meta property="article:section" content="posts">
-    <meta property="article:published_time" content="2025-02-11T16:36:29+08:00">
-    <meta property="article:modified_time" content="2025-02-11T16:36:29+08:00">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="如何为 nautilus 配置右键菜单">
-<meta name="twitter:description" content="nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。">
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position":  1 ,
-      "name": "Posts",
-      "item": "https://hazema0.github.io/posts/"
-    }, 
-    {
-      "@type": "ListItem",
-      "position":  2 ,
-      "name": "如何为 nautilus 配置右键菜单",
-      "item": "https://hazema0.github.io/posts/nautilus-right-click/"
-    }
-  ]
-}
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  "headline": "如何为 nautilus 配置右键菜单",
-  "name": "如何为 nautilus 配置右键菜单",
-  "description": "nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。",
-  "keywords": [
-    
-  ],
-  "articleBody": " 相关软件版本\nUbuntu 22.04 及以上 nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。\n本来其实没想到这样一个简单的任务会引起一些麻烦。把我处理这个麻烦的过程记下来吧。\n首先，我们百度搜索这个问题，从一些相当新的帖子获得的解决方案是安装 nautilus-actions。但意外的是，在 Ubuntu 22.04 中，这个包被移除了。\n我们转战谷歌，找到了这篇帖子，告诉我们这个软件因为缺少更新已经被上游的 gnome 存档了。我们也并不想使用已经被废弃的软件，那就去找替代方案吧——我相信不可能没有提供。\n意外发现：gnome 原来用 gitlab 管理项目，有趣。\n翻译者没有兴趣维护这个软件：“Sorry, but if there’s no contributions for several years, we’re not going to keep it active. It wastes the efforts of our translators. Feel free to fork and maintain it somewhere else if you like (it’s open source, after all).”\n另一篇帖子 指出了两个替代方案：一个是我在以前使用过的 Nautilus Scripts，最终效果是在右键菜单里面显示一个 Scripts 子菜单，里面有我们写好的脚本作为选项。这种方法不够优雅，我们希望显示在主右键菜单里面；另一个是 nautilus-python，出于对 python 的好感我们最终选择这个方案。\n问题又来了，在 Ubuntu 安装 nautilus-python，也没有这个包。经过检查，一篇帖子 指出其在 Ubuntu 源的名称是 python3-nautilus，这可能是因为一些误解产生的问题。\n现在我们学习写 python 代码来实现 nautilus-python 的扩展。参考资源：官方示例、linuxconfig.org 的教程。我们将写好的 python 文件保存到 ~/.local/share/nautilus-python/extensions/ 即可，然后重启 nautilus 即可。\n先看下面的示例，其为 VSCode 打开文件夹和文件提供了右键菜单（使用命令 wget -qO- https://raw.githubusercontent.com/harry-cpp/code-nautilus/master/install.sh | bash 以快速安装，我对代码做了一些简化，原本的源代码请参考相应的 GitHub 仓库）：\nfrom gi.repository import Nautilus, GObject from subprocess import call import os class VSCodeExtension(GObject.GObject, Nautilus.MenuProvider): # python 支持多重继承 def launch_vscode(self, menu, files): # 参数是 self, menu, files，注意不要修改 safepaths = '' args = '' for file in files: filepath = file.get_location().get_path() safepaths += '\"' + filepath + '\" ' if os.path.isdir(filepath) and os.path.exists(filepath): args = '--new-window ' call('code ' + args + safepaths + '\u0026', shell=True) def get_file_items(self, *args): # 右键文件/文件夹时对应的方法 files = args[-1] item = Nautilus.MenuItem( name='VSCodeOpen', label='Open in Code', tip='Opens the selected files with VSCode' ) item.connect('activate', self.launch_vscode, files) return [item] def get_background_items(self, *args): # 右键空白位置时的方法 file_ = args[-1] item = Nautilus.MenuItem( name='VSCodeOpenBackground', label='Open in Code', tip='Opens the current directory in VSCode' ) item.connect('activate', self.launch_vscode, [file_]) return [item] 上面的 python 代码足够直观了。get_backgroud_items 和 get_file_items 返回一个菜单数组，而菜单如何创建和与具体的操作方法链接上面的示例已经足够说明。\n",
-  "wordCount" : "227",
-  "inLanguage": "en",
-  "datePublished": "2025-02-11T16:36:29+08:00",
-  "dateModified": "2025-02-11T16:36:29+08:00",
-  "mainEntityOfPage": {
-    "@type": "WebPage",
-    "@id": "https://hazema0.github.io/posts/nautilus-right-click/"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Haze 的记事本",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://hazema0.github.io/favicon.ico"
-    }
-  }
-}
-</script>
+</noscript>
 </head>
 
 <body class="" id="top">
@@ -135,7 +73,7 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="https://hazema0.github.io/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
+            <a href="http://localhost:1313/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
                     <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
@@ -161,17 +99,17 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="https://hazema0.github.io/archives/" title="存档">
+                <a href="http://localhost:1313/archives/" title="存档">
                     <span>存档</span>
                 </a>
             </li>
             <li>
-                <a href="https://hazema0.github.io/tags/" title="标签">
+                <a href="http://localhost:1313/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="https://hazema0.github.io/search/" title="搜索">
+                <a href="http://localhost:1313/search/" title="搜索">
                     <span>搜索</span>
                 </a>
             </li>
@@ -253,7 +191,7 @@
     <ul class="post-tags">
     </ul>
 <nav class="paginav">
-  <a class="prev" href="https://hazema0.github.io/posts/nautilus-new-file/">
+  <a class="prev" href="http://localhost:1313/posts/nautilus-new-file/">
     <span class="title">« Prev</span>
     <br>
     <span>如何为 nautilus 右键菜单添加新建文件选项</span>
@@ -265,7 +203,7 @@
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="https://hazema0.github.io/">Haze 的记事本</a></span> · 
+        <span>&copy; 2025 <a href="http://localhost:1313/">Haze 的记事本</a></span> · 
 
     <span>
         Powered by
