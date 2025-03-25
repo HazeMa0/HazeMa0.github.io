@@ -2,45 +2,45 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Posts on Haze 的记事本</title>
-    <link>http://localhost:1313/posts/</link>
+    <link>https://hazema0.github.io/posts/</link>
     <description>Recent content in Posts on Haze 的记事本</description>
     <generator>Hugo -- 0.143.1</generator>
     <language>en</language>
     <lastBuildDate>Sun, 23 Mar 2025 18:00:00 +0800</lastBuildDate>
-    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://hazema0.github.io/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>操作系统复习·堆分配</title>
-      <link>http://localhost:1313/posts/os6-1/</link>
+      <link>https://hazema0.github.io/posts/os6-1/</link>
       <pubDate>Sun, 23 Mar 2025 18:00:00 +0800</pubDate>
-      <guid>http://localhost:1313/posts/os6-1/</guid>
-      <description>无论是操作系统还是 malloc 库，无论是单核 CPU 还是多核 CPU，堆分配都是操作系统实现和改良的核心话题之一。</description>
+      <guid>https://hazema0.github.io/posts/os6-1/</guid>
+      <description>无论是操作系统内部还是应用程序，无论是单核 CPU 还是多核 CPU，堆分配都是操作系统实现和改良的核心话题之一。</description>
     </item>
     <item>
       <title>操作系统复习·前言</title>
-      <link>http://localhost:1313/posts/os6-0/</link>
+      <link>https://hazema0.github.io/posts/os6-0/</link>
       <pubDate>Wed, 26 Feb 2025 16:09:09 +0800</pubDate>
-      <guid>http://localhost:1313/posts/os6-0/</guid>
+      <guid>https://hazema0.github.io/posts/os6-0/</guid>
       <description>本节内容和技术无关，纯属瞎唠叨。</description>
     </item>
     <item>
       <title>fly-hadoop2-workflow：让编写 hadoop 2.7 应用的效率飞起来</title>
-      <link>http://localhost:1313/posts/fly-hadoop2-workflow/</link>
+      <link>https://hazema0.github.io/posts/fly-hadoop2-workflow/</link>
       <pubDate>Mon, 17 Feb 2025 19:51:04 +0800</pubDate>
-      <guid>http://localhost:1313/posts/fly-hadoop2-workflow/</guid>
+      <guid>https://hazema0.github.io/posts/fly-hadoop2-workflow/</guid>
       <description>项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借助 Docker 和 Dev Container，舒适地开发老旧框架的程序。本文阐述了这个项目中遇到的困难。</description>
     </item>
     <item>
       <title>如何为 nautilus 右键菜单添加新建文件选项</title>
-      <link>http://localhost:1313/posts/nautilus-new-file/</link>
+      <link>https://hazema0.github.io/posts/nautilus-new-file/</link>
       <pubDate>Tue, 11 Feb 2025 17:56:58 +0800</pubDate>
-      <guid>http://localhost:1313/posts/nautilus-new-file/</guid>
+      <guid>https://hazema0.github.io/posts/nautilus-new-file/</guid>
       <description>为 nautilus 添加新建选项的菜单并不困难。因为 ~/Templates 就是专门为之服务的。</description>
     </item>
     <item>
       <title>如何为 nautilus 配置右键菜单</title>
-      <link>http://localhost:1313/posts/nautilus-right-click/</link>
+      <link>https://hazema0.github.io/posts/nautilus-right-click/</link>
       <pubDate>Tue, 11 Feb 2025 16:36:29 +0800</pubDate>
-      <guid>http://localhost:1313/posts/nautilus-right-click/</guid>
+      <guid>https://hazema0.github.io/posts/nautilus-right-click/</guid>
       <description>nautilus 是 GNOME 桌面环境默认的 GUI 文件管理器。本文介绍如何为 nautilus 添加自定义的右键菜单项。</description>
     </item>
   </channel>
