@@ -39,3 +39,8 @@ languages:
         - name: 搜索
           url: search/
           weight: 3
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true

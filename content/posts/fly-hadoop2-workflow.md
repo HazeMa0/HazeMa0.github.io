@@ -8,7 +8,7 @@ summary: '项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借�
 
 作为博客，还是整理一下这个过程中的困难吧。
 
-## 1 网络问题很烦人
+### 一、网络问题很烦人
 
 1. 首先，事实是：2024 年，中国大陆的主要高校和云服务商都关闭了 Docker Hub 的镜像源。但是百度仍有大量的帖子在建议更换镜像源以改善对 Docker Hub 的访问。
 
@@ -36,7 +36,7 @@ summary: '项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借�
 
 3. 我们认识到，`ping` 命令走的是 ICMP 协议，对测试 http/socks5 的代理没有意义。
 
-## 2 对 Docker 和 Dev Container 的错误理解
+### 二、对 Docker 和 Dev Container 的错误理解
 
 刚开始，我们在使用 Docker 运行和使用 Dev Container 作为开发环境上犹豫和摇摆了很长时间。我问了 AI 下面这一大段文字，可见我当时的烦躁。
 
@@ -59,7 +59,7 @@ Dev Container 相关问题是：
 4. 不知道为什么，让 Dev Container 执行我的脚本时不能正确识别 echo 的 -e 参数，而是将其作为文本打印。最后我们换用了 printf 命令。
 
 
-## 一些 linux 知识
+### 三、一些 linux 知识
 
 1. Hadoop 环境初始化脚本需要 ssh 连接，就会产生下面这种需要手动确认的麻烦问题：
 ```
@@ -81,7 +81,7 @@ git config --global core.autocrlf false
 
 3. 有趣的事实：JDK 1.x == JDK x
 
-## 2. 该死的讲义问题
+### 四、该死的讲义问题
 
 1. 讲义给出的一些命令根本是错误的。
 
@@ -89,7 +89,7 @@ git config --global core.autocrlf false
 
 3. 讲义没告诉我 start-all.sh 的正确位置，让我无法正确配置 PATH。
 
-## 鸣谢
+### 五、鸣谢
 
 感谢 DeepSeek 和 ChatGPT 耐心地听我抱怨和提出问题。没有任何一个人类受得了这么多怨气和不满。
 
