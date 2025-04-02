@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=4449&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=11703&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="noindex, nofollow">
@@ -9,16 +9,16 @@
 <meta name="keywords" content="">
 <meta name="description" content="作为无畏并发的基本手段，有必要复习一下设计锁的方法。">
 <meta name="author" content="">
-<link rel="canonical" href="http://localhost:4449/posts/os6-2/">
+<link rel="canonical" href="http://localhost:11703/posts/os6-2/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.9de45e225101e4f99701d2b68fc6b8a1ef6027928be6391fa15bf7f56326c909.css" integrity="sha256-neReIlEB5PmXAdK2j8a4oe9gJ5KL5jkfoVv39WMmyQk=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:4449/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:4449/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:4449/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:4449/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:4449/safari-pinned-tab.svg">
+<link rel="icon" href="http://localhost:11703/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:11703/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:11703/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:11703/apple-touch-icon.png">
+<link rel="mask-icon" href="http://localhost:11703/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:4449/posts/os6-2/">
+<link rel="alternate" hreflang="en" href="http://localhost:11703/posts/os6-2/">
 <noscript>
     <style>
         #theme-toggle,
@@ -73,7 +73,7 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="http://localhost:4449/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
+            <a href="http://localhost:11703/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
                     <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
@@ -99,17 +99,17 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="http://localhost:4449/archives/" title="存档">
+                <a href="http://localhost:11703/archives/" title="存档">
                     <span>存档</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:4449/tags/" title="标签">
+                <a href="http://localhost:11703/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:4449/search/" title="搜索">
+                <a href="http://localhost:11703/search/" title="搜索">
                     <span>搜索</span>
                 </a>
             </li>
@@ -158,10 +158,8 @@
 </span></span><span style="display:flex;"><span>    flag[self] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 </span></span><span style="display:flex;"><span>}
 </span></span></code></pre></div><h3 id="一test-and-set">一、test-and-set<a hidden class="anchor" aria-hidden="true" href="#一test-and-set">#</a></h3>
-<ul>
-<li>这种想法基于自旋锁（也就是只通过一个 flag 区分是否上锁），但是不依赖硬件显然不行，因为更精妙的 Peterson 都行不通。</li>
-<li>x86 提供了与以下 C 代码类似的<strong>原子指令</strong>，硬件保证这个过程的原子性：</li>
-</ul>
+<p>这种想法基于自旋锁（也就是只通过一个 flag 区分是否上锁），但是不依赖硬件显然不行，因为更精妙的 Peterson 都行不通。</p>
+<p>x86 提供了与以下 C 代码类似的<strong>原子指令</strong>，硬件保证这个过程的原子性：</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// not code, but hardware implemented atomic test-and-set operation
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">TEST_AND_SET</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>old_ptr, <span style="color:#66d9ef">int</span> new) {
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> old <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>old_ptr;
@@ -176,14 +174,129 @@
 </span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">lock</span>(lock <span style="color:#f92672">*</span>lock) {
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">TestAndSet</span>(<span style="color:#f92672">&amp;</span>lock<span style="color:#f92672">-&gt;</span>flag, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">TEST_AND_SET</span>(<span style="color:#f92672">&amp;</span>lock<span style="color:#f92672">-&gt;</span>flag, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
 </span></span><span style="display:flex;"><span>        ;
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">unlock</span>(lock <span style="color:#f92672">*</span>lock) {
 </span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
 </span></span><span style="display:flex;"><span>}
 </span></span><span style="display:flex;"><span><span style="color:#75715e">// 多么轻松愉快！
-</span></span></span></code></pre></div>
+</span></span></span></code></pre></div><p>先冷静一下，这样做对单处理器非抢占式系统是不行的，因为一旦无法获得锁，那就只能在那里空转，一切都没有办法停下来。但是还好这些系统已经不复存在，在多处理器这套办法工作的不错。</p>
+<h3 id="二compare-and-exchange">二、compare-and-exchange<a hidden class="anchor" aria-hidden="true" href="#二compare-and-exchange">#</a></h3>
+<p>先来看与硬件原语近似的代码：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">COMPARE_AND_EXCHANGE</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> ptr, <span style="color:#66d9ef">int</span> expected, <span style="color:#66d9ef">int</span> new) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> actual <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>ptr;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (actual <span style="color:#f92672">==</span> expected) {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>pyr <span style="color:#f92672">=</span> new;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> actual;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 如果和 expected 一样就换成新值，返回旧值
+</span></span></span></code></pre></div><p>我们只需把上面的代码换个 while 循环就行了：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">COMPARE_AND_EXCHANGE</span>(<span style="color:#f92672">&amp;</span>lock<span style="color:#f92672">-&gt;</span>flag, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    ;
+</span></span></code></pre></div><p>隐约可以感觉到，这条指令用来实现自旋锁是大材小用。它还有更高级的用法。</p>
+<h3 id="三load-linked--store-conditional">三、load-linked &amp; store-conditional<a hidden class="anchor" aria-hidden="true" href="#三load-linked--store-conditional">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">LOAD_LINKED</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>ptr) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span>ptr;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">STORE_CONDITIONAL</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>ptr, <span style="color:#66d9ef">int</span> value) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#960050;background-color:#1e0010">在调用</span> <span style="color:#a6e22e">LOAD_LINKED</span>(ptr) <span style="color:#960050;background-color:#1e0010">后没有人更新这个值</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> value;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>} 
+</span></span></code></pre></div><p>对应的锁的实现会复杂一些：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">lock</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">LOAD_LINKED</span>(lock<span style="color:#f92672">-&gt;</span>flag) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>            ; <span style="color:#75715e">// 是 1 先转着
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">STORE_CONDITIONAL</span>(lock<span style="color:#f92672">-&gt;</span>flag, <span style="color:#ae81ff">1</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">break</span>; <span style="color:#75715e">// 多个进程抢改变 flag 的机会
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">unlock</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>flag <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="四fetch-and-add">四、fetch-and-add<a hidden class="anchor" aria-hidden="true" href="#四fetch-and-add">#</a></h3>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">FETCH_AND_ADD</span>(<span style="color:#66d9ef">int</span><span style="color:#f92672">*</span> ptr) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> old <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>ptr;
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">*</span>ptr <span style="color:#f92672">=</span> old <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> old; <span style="color:#75715e">// 返回旧值，自增1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#75715e">// 相当于 (*ptr)++
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>}
+</span></span></code></pre></div><p>这是我们自己写的版本，它正常工作但还是不够好：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> b;
+</span></span><span style="display:flex;"><span>} lock;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">init</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>a <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>b <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">lock</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#a6e22e">FETCH_AND_ADD</span>(ptr<span style="color:#f92672">-&gt;</span>a) <span style="color:#f92672">&gt;</span> ptr<span style="color:#f92672">-&gt;</span>b)
+</span></span><span style="display:flex;"><span>        ;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">unlock</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    ptr<span style="color:#f92672">-&gt;</span>b <span style="color:#f92672">=</span> ptr<span style="color:#f92672">-&gt;</span>a;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// 我们的版本没有增添“让每个调用lock的线程都会按序被调用”这样的功能
+</span></span></span></code></pre></div><p>更好的实现是：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> <span style="color:#a6e22e">init</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>ticket <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>    lock<span style="color:#f92672">-&gt;</span>turn <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">lock</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> myturn <span style="color:#f92672">=</span> <span style="color:#a6e22e">FETCH_AND_ADD</span>(ptr<span style="color:#f92672">-&gt;</span>ticket);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (mytrun <span style="color:#f92672">!=</span> ptr<span style="color:#f92672">-&gt;</span>turn)
+</span></span><span style="display:flex;"><span>        ;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">unlock</span>(lock <span style="color:#f92672">*</span>lock) {
+</span></span><span style="display:flex;"><span>    ptr<span style="color:#f92672">-&gt;</span>turn<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>这种实现的好处是，让调用 FETCH_ADD_ADD 的顺序自然地变成了被解锁的顺序，确保线程的公平性。</p>
+<h3 id="五为什么非得自旋呢">五、为什么非得自旋呢？<a hidden class="anchor" aria-hidden="true" href="#五为什么非得自旋呢">#</a></h3>
+<p>自旋的进程浪费了大量CPU时间。操作系统显然应该给他们提供<strong>休眠</strong>的系统调用让其让出 CPU，然后在正确的时机再叫醒他们。</p>
+<p>下面给出的就是 GNU libc 为 linux 提供的锁的实现了：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mutex_lock</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>mutex) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> v;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Bit 31 was clear, we got the mutex (fastpath)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 第 31 位是最高位，如果是 0 说明锁是空闲的，直接返回。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">atomic_bit_test_set</span>(mutex, <span style="color:#ae81ff">31</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 递增 mutex，记录等待的线程数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">atomic_increment</span>(mutex);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (<span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">atomic_bit_test_set</span>(mutex, <span style="color:#ae81ff">31</span>) <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">atomic_decrement</span>(mutex);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 如果获得锁，减少等待线程数，返回
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// Have to waitFirst to make sure futex value
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// we are monitoring is negative (locked).
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// 如果锁变成正值，那不要睡眠，再次尝试
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        v <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>mutex;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> (v <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">continue</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 睡了睡了
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">futex_wait</span>(mutex, v);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mutex_unlock</span>(<span style="color:#66d9ef">int</span> <span style="color:#f92672">*</span>mutex) {
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// Adding 0x80000000 to counter results in 0 if and
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// only if there are not other interested threads
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 清零最高位，如果 mutex 变成 0 那就直接返回
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">atomic_add_zero</span>(mutex, <span style="color:#ae81ff">0x80000000</span>))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// There are other threads waiting for this mutex,
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// wake one of them up.
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 不为 0，唤醒一个进程吧。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">futex_wake</span>(mutex);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div>
 
   </div>
 
@@ -191,7 +304,7 @@
     <ul class="post-tags">
     </ul>
 <nav class="paginav">
-  <a class="next" href="http://localhost:4449/posts/os6-1/">
+  <a class="next" href="http://localhost:11703/posts/os6-1/">
     <span class="title">Next »</span>
     <br>
     <span>操作系统复习·堆分配</span>
@@ -203,7 +316,7 @@
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="http://localhost:4449/">Haze 的记事本</a></span> · 
+        <span>&copy; 2025 <a href="http://localhost:11703/">Haze 的记事本</a></span> · 
 
     <span>
         Powered by

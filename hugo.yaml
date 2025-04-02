@@ -7,7 +7,6 @@ params:
   defaultTheme: auto # to switch between dark or light according to browser theme
   ShowPostNavLinks: true
   ShowCodeCopyButtons: true
-  
   homeInfoParams:
     Title: 共同进步！
     Content: 心有所向，日复一日，必有精进。
