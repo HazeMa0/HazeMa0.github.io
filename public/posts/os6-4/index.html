@@ -5,11 +5,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="index, follow">
-<title>Series | Haze 的记事本</title>
+<title>操作系统复习·进程调度 | Haze 的记事本</title>
 <meta name="keywords" content="">
-<meta name="description" content="">
+<meta name="description" content="进程调度显然是内核的核心话题之一。我们记录下多级反馈队列（MLFQ）调度的工作原则，以便查阅。">
 <meta name="author" content="">
-<link rel="canonical" href="https://hazema0.github.io/series/">
+<link rel="canonical" href="https://hazema0.github.io/posts/os6-4/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.9de45e225101e4f99701d2b68fc6b8a1ef6027928be6391fa15bf7f56326c909.css" integrity="sha256-neReIlEB5PmXAdK2j8a4oe9gJ5KL5jkfoVv39WMmyQk=" rel="preload stylesheet" as="style">
 <link rel="icon" href="https://hazema0.github.io/favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="https://hazema0.github.io/favicon-16x16.png">
@@ -18,8 +18,7 @@
 <link rel="mask-icon" href="https://hazema0.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" type="application/rss+xml" href="https://hazema0.github.io/series/index.xml">
-<link rel="alternate" hreflang="en" href="https://hazema0.github.io/series/">
+<link rel="alternate" hreflang="en" href="https://hazema0.github.io/posts/os6-4/">
 <noscript>
     <style>
         #theme-toggle,
@@ -56,18 +55,72 @@
         }
 
     </style>
-</noscript><meta property="og:url" content="https://hazema0.github.io/series/">
+</noscript><meta property="og:url" content="https://hazema0.github.io/posts/os6-4/">
   <meta property="og:site_name" content="Haze 的记事本">
-  <meta property="og:title" content="Series">
+  <meta property="og:title" content="操作系统复习·进程调度">
+  <meta property="og:description" content="进程调度显然是内核的核心话题之一。我们记录下多级反馈队列（MLFQ）调度的工作原则，以便查阅。">
   <meta property="og:locale" content="en">
-  <meta property="og:type" content="website">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-03T10:58:00+08:00">
+    <meta property="article:modified_time" content="2025-04-03T10:58:00+08:00">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Series">
-<meta name="twitter:description" content="">
+<meta name="twitter:title" content="操作系统复习·进程调度">
+<meta name="twitter:description" content="进程调度显然是内核的核心话题之一。我们记录下多级反馈队列（MLFQ）调度的工作原则，以便查阅。">
 
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://hazema0.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "操作系统复习·进程调度",
+      "item": "https://hazema0.github.io/posts/os6-4/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "操作系统复习·进程调度",
+  "name": "操作系统复习·进程调度",
+  "description": "进程调度显然是内核的核心话题之一。我们记录下多级反馈队列（MLFQ）调度的工作原则，以便查阅。",
+  "keywords": [
+    
+  ],
+  "articleBody": "多级反馈队列（MLFQ）调度的工作原则：\n只运行最高优先级的任务； 如果这样的任务有多个，那就轮转执行； 工作最初拥有最高优先级； 工作用完某优先级允许的实践额度时，那就降低其优先级；（让更多短时间任务更好地被完成） 没过一段时间，就把工作重新提升到最高优先级，防止长时间任务饿死。 ",
+  "wordCount" : "6",
+  "inLanguage": "en",
+  "datePublished": "2025-04-03T10:58:00+08:00",
+  "dateModified": "2025-04-03T10:58:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://hazema0.github.io/posts/os6-4/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Haze 的记事本",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://hazema0.github.io/favicon.ico"
+    }
+  }
+}
+</script>
 </head>
 
-<body class="list" id="top">
+<body class="" id="top">
 <script>
     if (localStorage.getItem("pref-theme") === "dark") {
         document.body.classList.add('dark');
@@ -126,12 +179,42 @@
     </nav>
 </header>
 <main class="main">
-<header class="page-header">
-    <h1>Series</h1>
-</header>
 
-<ul class="terms-tags">
-</ul>
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      操作系统复习·进程调度
+    </h1>
+    <div class="post-meta"><span title='2025-04-03 10:58:00 +0800 CST'>April 3, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><p>多级反馈队列（MLFQ）调度的工作原则：</p>
+<ol>
+<li>只运行最高优先级的任务；</li>
+<li>如果这样的任务有多个，那就轮转执行；</li>
+<li>工作最初拥有最高优先级；</li>
+<li>工作用完某优先级允许的实践额度时，那就降低其优先级；（让更多短时间任务更好地被完成）</li>
+<li>没过一段时间，就把工作重新提升到最高优先级，防止长时间任务饿死。</li>
+</ol>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://hazema0.github.io/posts/os6-3/">
+    <span class="title">Next »</span>
+    <br>
+    <span>操作系统复习·同步</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
     </main>
     
 <footer class="footer">
@@ -202,6 +285,53 @@
         }
     })
 
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
 </script>
 </body>
 

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>操作系统复习·同步 | Haze 的记事本</title>
+<meta name="keywords" content="">
+<meta name="description" content="同步对并发来说也是必要的特性。条件变量和信号量都是支持同步的重要工具。">
+<meta name="author" content="">
+<link rel="canonical" href="https://hazema0.github.io/posts/os6-3/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.9de45e225101e4f99701d2b68fc6b8a1ef6027928be6391fa15bf7f56326c909.css" integrity="sha256-neReIlEB5PmXAdK2j8a4oe9gJ5KL5jkfoVv39WMmyQk=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://hazema0.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hazema0.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hazema0.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://hazema0.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://hazema0.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://hazema0.github.io/posts/os6-3/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="https://hazema0.github.io/posts/os6-3/">
+  <meta property="og:site_name" content="Haze 的记事本">
+  <meta property="og:title" content="操作系统复习·同步">
+  <meta property="og:description" content="同步对并发来说也是必要的特性。条件变量和信号量都是支持同步的重要工具。">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-02T07:02:00+08:00">
+    <meta property="article:modified_time" content="2025-04-02T07:02:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="操作系统复习·同步">
+<meta name="twitter:description" content="同步对并发来说也是必要的特性。条件变量和信号量都是支持同步的重要工具。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://hazema0.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "操作系统复习·同步",
+      "item": "https://hazema0.github.io/posts/os6-3/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "操作系统复习·同步",
+  "name": "操作系统复习·同步",
+  "description": "同步对并发来说也是必要的特性。条件变量和信号量都是支持同步的重要工具。",
+  "keywords": [
+    
+  ],
+  "articleBody": " Computer science is no more about computers than astronomy is about telescopes. ——Dijkstra\n一、条件变量 条件变量的类型是 cond_t。有两个 API：\nPthread_cond_wait(\u0026cond_t, \u0026mutex_t)： 解锁 mutex； 进入 wait 状态； 重新开始执行后，争夺 mutex； 返回。 Pthread_cond_signal(\u0026cond_t)： 使任意一个该条件变量对应的 wait 状态的进程就绪。（就绪不意味着立即执行，只是可能被调度。） 其最简单的用法是用来实现父进程对子进程的 join，也就是任务排序问题。\nwait() 可以阻塞父进程； 子进程执行完任务后，通过 signal() 给父进程发信号，使父进程继续执行。 二、生产者-消费者问题 接下来我们关注如何使用条件变量和锁解决生产者-消费者问题。我们以对一个 int 的 get 和 put 作为例子。\n（一）错误的尝试 我们首先给出一种错误的尝试：\nint count = 0; pthread_cond_t c; pthread_mutex_t m; void producer(int x) { Pthread_mutex_lock(\u0026m); count = 1; put(x); Pthread_cond_signal(\u0026c); // 这里必须加锁 // 虽然不是在所有情况下都必要，但是在signal时加锁是更被建议的行为。 Pthread_mutex_unlock(\u0026m); } void customer() { Pthread_mutex_lock(\u0026m); while (count == 0) // 这里用 while 的用意是在 wait 后再确认一下条件是否满足，减少 bug // 在多个生产者和消费者的情况下，显然 while 是必要的而非建议的 Pthread_cond_wait(\u0026c, \u0026m); // wait() 假定你已经获得了锁，在睡前放弃锁，在睡醒后抢夺锁 int x = get(); Pthread_mutex_unlock(\u0026m); } 我们使用了这些东西，它们缺一不可：\n条件：就是 count，用来在满足条件时跳过 wait()。 条件变量： 两方在进行条件访问时应当加上锁：防止意外的执行顺序让值被错误修改。 （二）正确的做法 上面的方法在一个生产者、一个消费者时工作的很好。但是在多个消费者和生产者时会出现致命的问题。 我们假定一个生产者 P，两个消费者 C1、C2。有以下的执行队列让大家长睡不醒：\nC1（不满足条件，睡眠）\rC2（不满足条件，睡眠）\rP（生产了一个东西）\rC1（被选中，就绪）\rP（不满足条件，睡眠）\rC1（消费）\rC2（被选中，就绪）\rC1（没数据可取，睡眠）\rC2（没数据可取，睡眠） 核心问题是，我们通过 signal 叫起来的可能不是我们需要的线程。这样我们就有两种方案了：\n使用两个条件变量，让生产者叫消费者起床，消费者叫生产者起床； 提供一个把所有线程都喊到就绪状态的函数。 第二个方法就是 pthread_cond_broadcast() 了。它会叫醒所有等待的线程，但是可能导致惊群效应（所有线程被唤醒后，只有一个线程真正能消费）。这并不是高效的做法。\n但是，有的情况下使用 broadcast 代替 signal 是一种行得通的办法。如果唤起的消费者不一定能够消费生产者的产物，那唤起所有的消费者是一种可行的解决方法。\n作为最后的总结，我们给出正确的代码：\ncond_t empty, full; mutex_t mutex; int count; void producer(int loops) { for (int i = 0; i \u003c loops; i++) { Pthread_mutex_lock(\u0026mutex); while (count == MAX) { Pthread_cond_wait(\u0026empty, \u0026mutex); } put(i); // do sth... Pthread_cond_signal(\u0026full); Pthread_mutex_unlock(\u0026mutex); } } void consumer(int loops) { for (int i = 0; i \u003c loops; i++) { Pthread_mutex_lock(\u0026mutex); while (count == 0) { Pthread_cond_wait(\u0026full, \u0026mutex); } int res = get(); // do sth... Pthread_cond_signal(\u0026empty); Pthread_mutex_unlock(\u0026mutex); printf(\"%d\\n\", res); } } 三、信号量 锁和条件变量确实无所不能，可以解决全部的（可解决的）并发问题。但是，它们给出的解决方案不一定是最简洁优雅的，对于一部分问题，信号量是方便的工具。我们给出信号量的 API：\nsem_t s; sem_init(\u0026s, 0, X); // 把 s 的值初始化为 X sem_wait(sem_t *s); // 把 s 的值减一。如果值是负的那就 wait。 // 这意味着 s 的值如果为负，其绝对值反映了等待的线程数。 sem_post(sem_t *s); // 把 s 的值加一。唤醒一个与 s 关联的 waiting 线程。 （一）信号量实现锁 // 锁的实现是很简单的 sem_init(\u0026m, 0, 1); sem_wait(\u0026m); // do sth... sem_post(\u0026m); 说实话，刚开始我的感受是，fetch-and-add 硬件原语和信号量机制很像。但是：\n前者没有提供原子性的减少值的方法， 而且也没有提供 wait 和唤醒的功能。 因此，它们完全不是一回事。\n（二）信号量解决任务排序问题 信号量用来保证执行顺序也很直观，只是初始值应该是 0，这样就能让 wait 卡住，由 post 唤醒。\n（三）信号量解决生产者-消费者问题 我们不能再犯以前犯过的错误：\n访问条件要加锁； while 确认是更好的； 使用两个条件变量，不然会死锁。 我们写出以下代码： sem_init(\u0026empty, 0, MAX); sem_init(\u0026full, 0, 0); sem_init(\u0026lock, 0, 1); void producer(int loops) { for (int i = 0; i \u003c loops; i++) { sem_wait(\u0026empty); sem_wait(\u0026lock); put(i); // do sth... sem_post(\u0026lock); sem_post(\u0026full); } } void consumer(int loops) { for (int i = 0; i \u003c loops; i++) { sem_wait(\u0026full); sem_wait(\u0026lock); int res = get(); // do sth... sem_post(\u0026lock); sem_post(\u0026empty); printf(\"%d\\n\", res); } } 因为 sem_wait()自带减值和判断功能，所以 while 循环被移除了；因为sem_wait() 不自带加锁和解锁的功能，我们只能把锁放到内部。\n很高兴的是，这样做没有什么问题。这就是最终的解决方案。\n（四）实现信号量 typedef struct _Zem_t { int value; pthread_cond_t* cond; pthread_mutex_t* lock; } Zem_t; void Zem_wait(Zem_t *s) { Pthread_mutex_lock(s-\u003elock); while(value \u003c 0) Pthread_cond_wait(s-\u003econd, s-\u003elock); value--; // 我们放弃了可能的负数表示 Pthread_mutex_unlock(s-\u003elock); } void Zem_post(Zem_t *s) { Pthread_mutex_lock(s-\u003elock); value++; Pthread_cond_post(s-\u003econd); Pthread_mutex_unlock(s-\u003elock); } 需要注意的是，因为信号量的 wait 是有条件的，而条件变量的 wait 是无条件的，很难用信号量实现条件变量。\n四、死锁 产生死锁的四个条件： 互斥：需要互斥访问； 持有并等待：持有了一部分锁，等待其他的锁； 非抢占：不能强制持有他人的锁； 循环等待：锁的依赖形成了环路。 预防死锁： 规定获取锁的顺序：可以通过比较锁的地址确保以相同的顺序获得锁；\n对抢锁的过程上锁：降低一些效率，确保锁被全部获得（这很难做到）；\n主动让锁：\ntop: lock(L1); if (trylock(L2) == -1) { unlock(L1); goto top; } 但是，太过谦让也可能导致“活锁”。一种解决方案是增加一些延迟，降低双方的礼让撞在一起的概率。\n而且，这样做还是很难封装成函数。\n避免互斥： 我们使用一些硬件提供的原子指令，来避免锁造成的问题。\n",
+  "wordCount" : "411",
+  "inLanguage": "en",
+  "datePublished": "2025-04-02T07:02:00+08:00",
+  "dateModified": "2025-04-02T07:02:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://hazema0.github.io/posts/os6-3/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Haze 的记事本",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://hazema0.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+
+<body class="" id="top">
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
+    }
+
+</script>
+
+<header class="header">
+    <nav class="nav">
+        <div class="logo">
+            <a href="https://hazema0.github.io/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" accesskey="t" title="(Alt + T)">
+                    <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg id="sun" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu">
+            <li>
+                <a href="https://hazema0.github.io/archives/" title="存档">
+                    <span>存档</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hazema0.github.io/tags/" title="标签">
+                    <span>标签</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hazema0.github.io/search/" title="搜索">
+                    <span>搜索</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    
+    <h1 class="post-title entry-hint-parent">
+      操作系统复习·同步
+    </h1>
+    <div class="post-meta"><span title='2025-04-02 07:02:00 +0800 CST'>April 2, 2025</span>
+
+</div>
+  </header> 
+  <div class="post-content"><blockquote>
+<p>Computer science is no more about computers than astronomy is about telescopes.  ——Dijkstra</p></blockquote>
+<h3 id="一条件变量">一、条件变量<a hidden class="anchor" aria-hidden="true" href="#一条件变量">#</a></h3>
+<p>条件变量的类型是 <code>cond_t</code>。有两个 API：</p>
+<ol>
+<li><code>Pthread_cond_wait(&amp;cond_t, &amp;mutex_t)</code>：
+<ol>
+<li>解锁 <code>mutex</code>；</li>
+<li>进入 wait 状态；</li>
+<li>重新开始执行后，争夺 <code>mutex</code>；</li>
+<li>返回。</li>
+</ol>
+</li>
+<li><code>Pthread_cond_signal(&amp;cond_t)</code>：
+<ol>
+<li>使任意一个该条件变量对应的 wait 状态的进程就绪。（就绪不意味着立即执行，只是可能被调度。）</li>
+</ol>
+</li>
+</ol>
+<p>其最简单的用法是用来实现父进程对子进程的 join，也就是任务排序问题。</p>
+<ul>
+<li>wait() 可以阻塞父进程；</li>
+<li>子进程执行完任务后，通过 signal() 给父进程发信号，使父进程继续执行。</li>
+</ul>
+<h3 id="二生产者-消费者问题">二、生产者-消费者问题<a hidden class="anchor" aria-hidden="true" href="#二生产者-消费者问题">#</a></h3>
+<p>接下来我们关注如何使用条件变量和锁解决生产者-消费者问题。我们以对一个 int 的 get 和 put 作为例子。</p>
+<h4 id="一错误的尝试">（一）错误的尝试<a hidden class="anchor" aria-hidden="true" href="#一错误的尝试">#</a></h4>
+<p>我们首先给出一种错误的尝试：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> count <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">pthread_cond_t</span> c;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">pthread_mutex_t</span> m;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">producer</span>(<span style="color:#66d9ef">int</span> x) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_mutex_lock</span>(<span style="color:#f92672">&amp;</span>m);
+</span></span><span style="display:flex;"><span>    count <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">put</span>(x);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_cond_signal</span>(<span style="color:#f92672">&amp;</span>c);    <span style="color:#75715e">// 这里必须加锁
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                                <span style="color:#75715e">// 虽然不是在所有情况下都必要，但是在signal时加锁是更被建议的行为。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">Pthread_mutex_unlock</span>(<span style="color:#f92672">&amp;</span>m);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">customer</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_mutex_lock</span>(<span style="color:#f92672">&amp;</span>m);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span> (count <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) <span style="color:#75715e">// 这里用 while 的用意是在 wait 后再确认一下条件是否满足，减少 bug
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                       <span style="color:#75715e">// 在多个生产者和消费者的情况下，显然 while 是必要的而非建议的
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">Pthread_cond_wait</span>(<span style="color:#f92672">&amp;</span>c, <span style="color:#f92672">&amp;</span>m); <span style="color:#75715e">// wait() 假定你已经获得了锁，在睡前放弃锁，在睡醒后抢夺锁
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> <span style="color:#a6e22e">get</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_mutex_unlock</span>(<span style="color:#f92672">&amp;</span>m);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>我们使用了这些东西，它们缺一不可：</p>
+<ul>
+<li>条件：就是 <code>count</code>，用来在满足条件时跳过 wait()。</li>
+<li>条件变量：</li>
+<li>两方在进行条件访问时应当加上锁：防止意外的执行顺序让值被错误修改。</li>
+</ul>
+<h4 id="二正确的做法">（二）正确的做法<a hidden class="anchor" aria-hidden="true" href="#二正确的做法">#</a></h4>
+<p>上面的方法在一个生产者、一个消费者时工作的很好。但是在多个消费者和生产者时会出现致命的问题。
+我们假定一个生产者 P，两个消费者 C1、C2。有以下的执行队列让大家长睡不醒：</p>
+<pre tabindex="0"><code>C1（不满足条件，睡眠）
+                        C2（不满足条件，睡眠）
+                                                P（生产了一个东西）
+C1（被选中，就绪）
+                                                P（不满足条件，睡眠）
+C1（消费）
+                        C2（被选中，就绪）
+C1（没数据可取，睡眠）
+                        C2（没数据可取，睡眠）
+</code></pre><p>核心问题是，我们通过 signal 叫起来的可能不是我们需要的线程。这样我们就有两种方案了：</p>
+<ul>
+<li>使用两个条件变量，让生产者叫消费者起床，消费者叫生产者起床；</li>
+<li>提供一个把所有线程都喊到就绪状态的函数。</li>
+</ul>
+<p>第二个方法就是 <code>pthread_cond_broadcast()</code> 了。它会叫醒所有等待的线程，但是可能导致<strong>惊群效应</strong>（所有线程被唤醒后，只有一个线程真正能消费）。这并不是高效的做法。</p>
+<p>但是，有的情况下使用 <code>broadcast</code> 代替 <code>signal</code> 是一种行得通的办法。如果唤起的消费者不一定能够消费生产者的产物，那唤起所有的消费者是一种可行的解决方法。</p>
+<p>作为最后的总结，我们给出正确的代码：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">cond_t</span> empty, full;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">mutex_t</span> mutex;
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">int</span> count;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">producer</span>(<span style="color:#66d9ef">int</span> loops) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> loops; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Pthread_mutex_lock</span>(<span style="color:#f92672">&amp;</span>mutex);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (count <span style="color:#f92672">==</span> MAX) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">Pthread_cond_wait</span>(<span style="color:#f92672">&amp;</span>empty, <span style="color:#f92672">&amp;</span>mutex);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">put</span>(i); <span style="color:#75715e">// do sth...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">Pthread_cond_signal</span>(<span style="color:#f92672">&amp;</span>full);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Pthread_mutex_unlock</span>(<span style="color:#f92672">&amp;</span>mutex);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>} 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">consumer</span>(<span style="color:#66d9ef">int</span> loops) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> loops; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Pthread_mutex_lock</span>(<span style="color:#f92672">&amp;</span>mutex);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> (count <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">Pthread_cond_wait</span>(<span style="color:#f92672">&amp;</span>full, <span style="color:#f92672">&amp;</span>mutex);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> res <span style="color:#f92672">=</span> <span style="color:#a6e22e">get</span>(); <span style="color:#75715e">// do sth...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">Pthread_cond_signal</span>(<span style="color:#f92672">&amp;</span>empty);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Pthread_mutex_unlock</span>(<span style="color:#f92672">&amp;</span>mutex);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, res);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="三信号量">三、信号量<a hidden class="anchor" aria-hidden="true" href="#三信号量">#</a></h3>
+<p>锁和条件变量确实无所不能，可以解决全部的（可解决的）并发问题。但是，它们给出的解决方案不一定是最简洁优雅的，对于一部分问题，信号量是方便的工具。我们给出信号量的 API：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">sem_t</span> s;
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sem_init</span>(<span style="color:#f92672">&amp;</span>s, <span style="color:#ae81ff">0</span>, X); <span style="color:#75715e">// 把 s 的值初始化为 X
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">sem_wait</span>(<span style="color:#66d9ef">sem_t</span> <span style="color:#f92672">*</span>s); <span style="color:#75715e">// 把 s 的值减一。如果值是负的那就 wait。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    <span style="color:#75715e">// 这意味着 s 的值如果为负，其绝对值反映了等待的线程数。
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">sem_post</span>(<span style="color:#66d9ef">sem_t</span> <span style="color:#f92672">*</span>s); <span style="color:#75715e">// 把 s 的值加一。唤醒一个与 s 关联的 waiting 线程。
+</span></span></span></code></pre></div><h4 id="一信号量实现锁">（一）信号量实现锁<a hidden class="anchor" aria-hidden="true" href="#一信号量实现锁">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#75715e">// 锁的实现是很简单的
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">sem_init</span>(<span style="color:#f92672">&amp;</span>m, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sem_wait</span>(<span style="color:#f92672">&amp;</span>m);
+</span></span><span style="display:flex;"><span><span style="color:#75715e">// do sth...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#a6e22e">sem_post</span>(<span style="color:#f92672">&amp;</span>m);
+</span></span></code></pre></div><blockquote>
+<p>说实话，刚开始我的感受是，fetch-and-add 硬件原语和信号量机制很像。但是：</p>
+<ul>
+<li>前者没有提供原子性的减少值的方法，</li>
+<li>而且也没有提供 wait 和唤醒的功能。</li>
+</ul>
+<p>因此，它们完全不是一回事。</p></blockquote>
+<h4 id="二信号量解决任务排序问题">（二）信号量解决任务排序问题<a hidden class="anchor" aria-hidden="true" href="#二信号量解决任务排序问题">#</a></h4>
+<p>信号量用来保证执行顺序也很直观，只是初始值应该是 0，这样就能让 wait 卡住，由 post 唤醒。</p>
+<h4 id="三信号量解决生产者-消费者问题">（三）信号量解决生产者-消费者问题<a hidden class="anchor" aria-hidden="true" href="#三信号量解决生产者-消费者问题">#</a></h4>
+<p>我们不能再犯以前犯过的错误：</p>
+<ul>
+<li>访问条件要加锁；</li>
+<li>while 确认是更好的；</li>
+<li>使用两个条件变量，不然会死锁。
+我们写出以下代码：</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#a6e22e">sem_init</span>(<span style="color:#f92672">&amp;</span>empty, <span style="color:#ae81ff">0</span>, MAX);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sem_init</span>(<span style="color:#f92672">&amp;</span>full, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span><span style="color:#a6e22e">sem_init</span>(<span style="color:#f92672">&amp;</span>lock, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">producer</span>(<span style="color:#66d9ef">int</span> loops) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> loops; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sem_wait</span>(<span style="color:#f92672">&amp;</span>empty);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sem_wait</span>(<span style="color:#f92672">&amp;</span>lock);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">put</span>(i); <span style="color:#75715e">// do sth...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">sem_post</span>(<span style="color:#f92672">&amp;</span>lock);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sem_post</span>(<span style="color:#f92672">&amp;</span>full);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>} 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">consumer</span>(<span style="color:#66d9ef">int</span> loops) {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> loops; i<span style="color:#f92672">++</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sem_wait</span>(<span style="color:#f92672">&amp;</span>full);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sem_wait</span>(<span style="color:#f92672">&amp;</span>lock);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> res <span style="color:#f92672">=</span> <span style="color:#a6e22e">get</span>(); <span style="color:#75715e">// do sth...
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#a6e22e">sem_post</span>(<span style="color:#f92672">&amp;</span>lock);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">sem_post</span>(<span style="color:#f92672">&amp;</span>empty);
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">printf</span>(<span style="color:#e6db74">&#34;%d</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, res);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>因为 sem_wait()自带减值和判断功能，所以 while 循环被移除了；因为sem_wait() 不自带加锁和解锁的功能，我们只能把锁放到内部。</p>
+<p>很高兴的是，这样做没有什么问题。这就是最终的解决方案。</p>
+<h4 id="四实现信号量">（四）实现信号量<a hidden class="anchor" aria-hidden="true" href="#四实现信号量">#</a></h4>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#66d9ef">typedef</span> <span style="color:#66d9ef">struct</span> _Zem_t {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> value;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pthread_cond_t</span><span style="color:#f92672">*</span> cond;
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">pthread_mutex_t</span><span style="color:#f92672">*</span> lock;
+</span></span><span style="display:flex;"><span>} Zem_t;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Zem_wait</span>(Zem_t <span style="color:#f92672">*</span>s) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_mutex_lock</span>(s<span style="color:#f92672">-&gt;</span>lock);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">while</span>(value <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">0</span>) 
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">Pthread_cond_wait</span>(s<span style="color:#f92672">-&gt;</span>cond, s<span style="color:#f92672">-&gt;</span>lock);
+</span></span><span style="display:flex;"><span>    value<span style="color:#f92672">--</span>; <span style="color:#75715e">// 我们放弃了可能的负数表示
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">Pthread_mutex_unlock</span>(s<span style="color:#f92672">-&gt;</span>lock);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">Zem_post</span>(Zem_t <span style="color:#f92672">*</span>s) {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_mutex_lock</span>(s<span style="color:#f92672">-&gt;</span>lock);
+</span></span><span style="display:flex;"><span>    value<span style="color:#f92672">++</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_cond_post</span>(s<span style="color:#f92672">-&gt;</span>cond);
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">Pthread_mutex_unlock</span>(s<span style="color:#f92672">-&gt;</span>lock);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>需要注意的是，因为信号量的 wait 是有条件的，而条件变量的 wait 是无条件的，很难用信号量实现条件变量。</p>
+<h3 id="四死锁">四、死锁<a hidden class="anchor" aria-hidden="true" href="#四死锁">#</a></h3>
+<ol>
+<li>产生死锁的四个条件：</li>
+</ol>
+<ul>
+<li>互斥：需要互斥访问；</li>
+<li>持有并等待：持有了一部分锁，等待其他的锁；</li>
+<li>非抢占：不能强制持有他人的锁；</li>
+<li>循环等待：锁的依赖形成了环路。</li>
+</ul>
+<ol start="2">
+<li>预防死锁：</li>
+</ol>
+<ul>
+<li>
+<p>规定获取锁的顺序：可以通过比较锁的地址确保以相同的顺序获得锁；</p>
+</li>
+<li>
+<p>对抢锁的过程上锁：降低一些效率，确保锁被全部获得（这很难做到）；</p>
+</li>
+<li>
+<p>主动让锁：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>top:
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">lock</span>(L1);
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> (<span style="color:#a6e22e">trylock</span>(L2) <span style="color:#f92672">==</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">unlock</span>(L1);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">goto</span> top;
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>但是，太过谦让也可能导致“活锁”。一种解决方案是增加一些延迟，降低双方的礼让撞在一起的概率。</p>
+<p>而且，这样做还是很难封装成函数。</p>
+</li>
+<li>
+<p>避免互斥：
+我们使用一些硬件提供的原子指令，来避免锁造成的问题。</p>
+</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+    </ul>
+<nav class="paginav">
+  <a class="prev" href="https://hazema0.github.io/posts/os6-4/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>操作系统复习·进程调度</span>
+  </a>
+  <a class="next" href="https://hazema0.github.io/posts/os6-2/">
+    <span class="title">Next »</span>
+    <br>
+    <span>操作系统复习·锁</span>
+  </a>
+</nav>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2025 <a href="https://hazema0.github.io/">Haze 的记事本</a></span> · 
+
+    <span>
+        Powered by
+        <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" aria-label="go to top" title="Go to Top (Alt + G)" class="top-link" id="top-link" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 6" fill="currentColor">
+        <path d="M12 6H0l6-6z" />
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu')
+    if (menu) {
+        menu.scrollLeft = localStorage.getItem("menu-scroll-position");
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var mybutton = document.getElementById("top-link");
+    window.onscroll = function () {
+        if (document.body.scrollTop > 800 || document.documentElement.scrollTop > 800) {
+            mybutton.style.visibility = "visible";
+            mybutton.style.opacity = "1";
+        } else {
+            mybutton.style.visibility = "hidden";
+            mybutton.style.opacity = "0";
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        if (document.body.className.includes("dark")) {
+            document.body.classList.remove('dark');
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            document.body.classList.add('dark');
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

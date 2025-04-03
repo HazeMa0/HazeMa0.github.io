@@ -1,24 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=11703&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="index, follow">
 <title>操作系统复习·锁 | Haze 的记事本</title>
 <meta name="keywords" content="">
-<meta name="description" content="作为无畏并发的基本手段，有必要复习一下设计锁的方法。">
+<meta name="description" content="作为无畏并发的基本手段，锁为我们提供了互斥性，让我们对并发产生的结果更加确定。">
 <meta name="author" content="">
-<link rel="canonical" href="http://localhost:11703/posts/os6-2/">
+<link rel="canonical" href="https://hazema0.github.io/posts/os6-2/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.9de45e225101e4f99701d2b68fc6b8a1ef6027928be6391fa15bf7f56326c909.css" integrity="sha256-neReIlEB5PmXAdK2j8a4oe9gJ5KL5jkfoVv39WMmyQk=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:11703/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:11703/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:11703/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:11703/apple-touch-icon.png">
-<link rel="mask-icon" href="http://localhost:11703/safari-pinned-tab.svg">
+<link rel="icon" href="https://hazema0.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hazema0.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hazema0.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://hazema0.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://hazema0.github.io/safari-pinned-tab.svg">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:11703/posts/os6-2/">
+<link rel="alternate" hreflang="en" href="https://hazema0.github.io/posts/os6-2/">
 <noscript>
     <style>
         #theme-toggle,
@@ -55,7 +55,69 @@
         }
 
     </style>
-</noscript>
+</noscript><meta property="og:url" content="https://hazema0.github.io/posts/os6-2/">
+  <meta property="og:site_name" content="Haze 的记事本">
+  <meta property="og:title" content="操作系统复习·锁">
+  <meta property="og:description" content="作为无畏并发的基本手段，锁为我们提供了互斥性，让我们对并发产生的结果更加确定。">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-04-02T02:16:00+08:00">
+    <meta property="article:modified_time" content="2025-04-02T02:16:00+08:00">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="操作系统复习·锁">
+<meta name="twitter:description" content="作为无畏并发的基本手段，锁为我们提供了互斥性，让我们对并发产生的结果更加确定。">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Posts",
+      "item": "https://hazema0.github.io/posts/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "操作系统复习·锁",
+      "item": "https://hazema0.github.io/posts/os6-2/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "操作系统复习·锁",
+  "name": "操作系统复习·锁",
+  "description": "作为无畏并发的基本手段，锁为我们提供了互斥性，让我们对并发产生的结果更加确定。",
+  "keywords": [
+    
+  ],
+  "articleBody": " 我，无畏并发。 ——也许存在于某个平行宇宙的《BanG Dream! Ave Mujica》（但大概率也是烂番）\n零、一些基本的讨论 锁应当存放在大家共用的内存空间，总之不应该是栈。 一个好的锁应该提供正确的互斥、保障线程公平、性能优秀。 零、一些失败的想法 关中断：这很容易被滥用，导致系统接收不到中断信息；不适用于多处理器系统。 Peterson 算法：必须假设访存的原子性，但这一点现代硬件早就打破了。 int flag[2]; int turn; void init() { flag[0] = flag[1] = 0; turn = 0; } void lock() { flag[self] = 1; // 竖起自己的旗子 turn = 1 - self; // 让 turn 等于对面 // 我们假设对面此时也执行了这两句，turn 此时等于 self while((flag[1 - self] == 1) \u0026\u0026 (turn == 1 - self)) ; // 因为对面改变了turn，那我们先执行了，对面先等着 // 先修改 turn 的才能跳出这个 while，也就是手快有手慢无 } void unlock() { flag[self] = 0; } 一、test-and-set 这种想法基于自旋锁（也就是只通过一个 flag 区分是否上锁），但是不依赖硬件显然不行，因为更精妙的 Peterson 都行不通。\nx86 提供了与以下 C 代码类似的原子指令，硬件保证这个过程的原子性：\n// not code, but hardware implemented atomic test-and-set operation int TEST_AND_SET(int *old_ptr, int new) { int old = *old_ptr; *old_ptr = new; return old; } // 也就是把值改成新的，返回旧值 这样我们终于能够设计年轻人的第一把锁了：\n// this is C code!!! void init(lock *lock) { lock-\u003eflag = 0; } void lock(lock *lock) { while (TEST_AND_SET(\u0026lock-\u003eflag, 1) == 1) ; } void unlock(lock *lock) { lock-\u003eflag = 0; } // 多么轻松愉快！ 先冷静一下，这样做对单处理器非抢占式系统是不行的，因为一旦无法获得锁，那就只能在那里空转，一切都没有办法停下来。但是还好这些系统已经不复存在，在多处理器这套办法工作的不错。\n二、compare-and-exchange 先来看与硬件原语近似的代码：\nint COMPARE_AND_EXCHANGE(int* ptr, int expected, int new) { int actual = *ptr; if (actual == expected) { *pyr = new; } return actual; } // 如果和 expected 一样就换成新值，返回旧值 我们只需把上面的代码换个 while 循环就行了：\nwhile (COMPARE_AND_EXCHANGE(\u0026lock-\u003eflag, 0, 1) == 1) ; 隐约可以感觉到，这条指令用来实现自旋锁是大材小用。它还有更高级的用法。\n三、load-linked \u0026 store-conditional int LOAD_LINKED(int *ptr) { return *ptr; } int STORE_CONDITIONAL(int *ptr, int value) { if (在调用 LOAD_LINKED(ptr) 后没有人更新这个值) { *ptr = value; return 1; } return 0; } 对应的锁的实现会复杂一些：\nvoid lock(lock *lock) { while (1) { while (LOAD_LINKED(lock-\u003eflag) == 1) ; // 是 1 先转着 if (STORE_CONDITIONAL(lock-\u003eflag, 1) == 1) break; // 多个进程抢改变 flag 的机会 } } void unlock(lock *lock) { lock-\u003eflag = 0; } 四、fetch-and-add int FETCH_AND_ADD(int* ptr) { int old = *ptr; *ptr = old + 1; return old; // 返回旧值，自增1 // 相当于 (*ptr)++ } 这是我们自己写的版本，它正常工作但还是不够好：\ntypedef struct { int a; int b; } lock; void init(lock *lock) { lock-\u003ea = 0; lock-\u003eb = 0; } void lock(lock *lock) { while (FETCH_AND_ADD(ptr-\u003ea) \u003e ptr-\u003eb) ; } void unlock(lock *lock) { ptr-\u003eb = ptr-\u003ea; } // 我们的版本没有增添“让每个调用lock的线程都会按序被调用”这样的功能 更好的实现是：\nint init(lock *lock) { lock-\u003eticket = 0; lock-\u003eturn = 0; } void lock(lock *lock) { int myturn = FETCH_AND_ADD(ptr-\u003eticket); while (mytrun != ptr-\u003eturn) ; } void unlock(lock *lock) { ptr-\u003eturn++; } 这种实现的好处是，让调用 FETCH_ADD_ADD 的顺序自然地变成了被解锁的顺序，确保线程的公平性。\n五、为什么非得自旋呢？ 自旋的进程浪费了大量CPU时间。操作系统显然应该给他们提供休眠的系统调用让其让出 CPU，然后在正确的时机再叫醒他们。\n下面给出的就是 GNU libc 为 linux 提供的锁的实现了：\nvoid mutex_lock(int *mutex) { int v; // Bit 31 was clear, we got the mutex (fastpath) // 第 31 位是最高位，如果是 0 说明锁是空闲的，直接返回。 if (atomic_bit_test_set(mutex, 31) == 0) return; // 递增 mutex，记录等待的线程数 atomic_increment(mutex); while (1) { if (atomic_bit_test_set(mutex, 31) == 0) { atomic_decrement(mutex); return; // 如果获得锁，减少等待线程数，返回 } // Have to waitFirst to make sure futex value // we are monitoring is negative (locked). // 如果锁变成正值，那不要睡眠，再次尝试 v = *mutex; if (v \u003e= 0) continue; // 睡了睡了 futex_wait(mutex, v); } } void mutex_unlock(int *mutex) { // Adding 0x80000000 to counter results in 0 if and // only if there are not other interested threads // 清零最高位，如果 mutex 变成 0 那就直接返回 if (atomic_add_zero(mutex, 0x80000000)) return; // There are other threads waiting for this mutex, // wake one of them up. // 不为 0，唤醒一个进程吧。 futex_wake(mutex); } 六、使用锁 最显然的使用锁的方法被称作“一把大锁保平安”。对核心数据结构的修改和读取应当在加了锁的情况下再去进行。\n“一把大锁保平安”足够简单，但如果遇到了性能瓶颈，那应该考虑进行一些性能优化。（过早优化是万恶之源。）\n另外，要小心控制流！如果不在特殊控制流（例如错误处理）的时候释放锁，可能造成死锁的情况。\n（一）计数器 我们这样设计：给每个 CPU Core 准备一个局部计数器和对应的局部锁，每个 Core 上的计数器修改会在局部计数器上进行。当局部计数器满足一定阈值 S 时，争夺全局锁，把结果加给全局计数器。通过阈值，我们平衡准确度和性能。\n（二）队列 我们希望在队列头和队列尾的操作能够并行，那么准备两把锁是个好主意。为了不让头和尾的操作互相干扰，应该添加一个特殊的空白节点。\n",
+  "wordCount" : "510",
+  "inLanguage": "en",
+  "datePublished": "2025-04-02T02:16:00+08:00",
+  "dateModified": "2025-04-02T02:16:00+08:00",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://hazema0.github.io/posts/os6-2/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Haze 的记事本",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://hazema0.github.io/favicon.ico"
+    }
+  }
+}
+</script>
 </head>
 
 <body class="" id="top">
@@ -73,7 +135,7 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="http://localhost:11703/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
+            <a href="https://hazema0.github.io/" accesskey="h" title="Haze 的记事本 (Alt + H)">Haze 的记事本</a>
             <div class="logo-switches">
                 <button id="theme-toggle" accesskey="t" title="(Alt + T)">
                     <svg id="moon" xmlns="http://www.w3.org/2000/svg" width="24" height="18" viewBox="0 0 24 24"
@@ -99,17 +161,17 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="http://localhost:11703/archives/" title="存档">
+                <a href="https://hazema0.github.io/archives/" title="存档">
                     <span>存档</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:11703/tags/" title="标签">
+                <a href="https://hazema0.github.io/tags/" title="标签">
                     <span>标签</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:11703/search/" title="搜索">
+                <a href="https://hazema0.github.io/search/" title="搜索">
                     <span>搜索</span>
                 </a>
             </li>
@@ -129,7 +191,7 @@
 </div>
   </header> 
   <div class="post-content"><blockquote>
-<p>我，无畏并发。 《BanG Dream! Ave Mujica》（大嘘）</p></blockquote>
+<p>我，无畏并发。 ——也许存在于某个平行宇宙的《BanG Dream! Ave Mujica》（但大概率也是烂番）</p></blockquote>
 <h3 id="零一些基本的讨论">零、一些基本的讨论<a hidden class="anchor" aria-hidden="true" href="#零一些基本的讨论">#</a></h3>
 <ul>
 <li>锁应当存放在大家共用的内存空间，总之不应该是栈。</li>
@@ -296,7 +358,15 @@
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#75715e">// 不为 0，唤醒一个进程吧。
 </span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#a6e22e">futex_wake</span>(mutex);
 </span></span><span style="display:flex;"><span>}
-</span></span></code></pre></div>
+</span></span></code></pre></div><h3 id="六使用锁">六、使用锁<a hidden class="anchor" aria-hidden="true" href="#六使用锁">#</a></h3>
+<p>最显然的使用锁的方法被称作“一把大锁保平安”。对核心数据结构的修改和读取应当在加了锁的情况下再去进行。</p>
+<p>“一把大锁保平安”足够简单，但如果遇到了性能瓶颈，那应该考虑进行一些性能优化。（过早优化是万恶之源。）</p>
+<p>另外，要小心控制流！如果不在特殊控制流（例如错误处理）的时候释放锁，可能造成死锁的情况。</p>
+<h4 id="一计数器">（一）计数器<a hidden class="anchor" aria-hidden="true" href="#一计数器">#</a></h4>
+<p>我们这样设计：给每个 CPU Core 准备一个局部计数器和对应的局部锁，每个 Core 上的计数器修改会在局部计数器上进行。当局部计数器满足一定阈值 S 时，争夺全局锁，把结果加给全局计数器。通过阈值，我们平衡准确度和性能。</p>
+<h4 id="二队列">（二）队列<a hidden class="anchor" aria-hidden="true" href="#二队列">#</a></h4>
+<p>我们希望在队列头和队列尾的操作能够并行，那么准备两把锁是个好主意。为了不让头和尾的操作互相干扰，应该添加一个特殊的空白节点。</p>
+
 
   </div>
 
@@ -304,7 +374,12 @@
     <ul class="post-tags">
     </ul>
 <nav class="paginav">
-  <a class="next" href="http://localhost:11703/posts/os6-1/">
+  <a class="prev" href="https://hazema0.github.io/posts/os6-3/">
+    <span class="title">« Prev</span>
+    <br>
+    <span>操作系统复习·同步</span>
+  </a>
+  <a class="next" href="https://hazema0.github.io/posts/os6-1/">
     <span class="title">Next »</span>
     <br>
     <span>操作系统复习·堆分配</span>
@@ -316,7 +391,7 @@
     </main>
     
 <footer class="footer">
-        <span>&copy; 2025 <a href="http://localhost:11703/">Haze 的记事本</a></span> · 
+        <span>&copy; 2025 <a href="https://hazema0.github.io/">Haze 的记事本</a></span> · 
 
     <span>
         Powered by
