@@ -13,6 +13,7 @@ summary: '如果你也曾因为 C 盘根目录出现 .GamingRoot 文件而卸载
 ## 第一步：MS Store 加载系统“游戏平台服务” DLL
 
 MS Store 附带了一个 dll，名为 `Microsoft.GamePlatform.Services.dll`，其典型位置是 `C:\Program Files\WindowsApps\Microsoft.WindowsStore_...\microsoft.gameplatform.services.dll`。这个 dll 在 WinStore.App.exe 中被加载，用途是提供游戏相关的接口：
+
 ```xml
 <!--AppxManifest.xml-->
 <Extension Category="windows.activatableClass.inProcessServer">
@@ -71,6 +72,7 @@ if ((cVar1 == '\0') && (cVar1 = FUN_18007b910(0x1800d1780), cVar1 == '\0')) {
 ```
 
 笔者使用 windbg 观察 MS Store 的运行，记录到了相同的错误：
+
 ```text
 status\lib\statusapi.cpp(182) ... ReturnHr(1) ... 80070424
 ...
@@ -178,6 +180,7 @@ FAULT_MEMORY ... STATE 0x10000
 对遇到相同缺包错误的用户，安装 [Gaming Services（Microsoft Store 链接）](https://apps.microsoft.com/detail/9MWPM2CQNLHN) 是直接的缓解方向：补回缺失组件，让接口有机会正常初始化，从而避免反复失败和卸载。
 
 ## 为什么你可能卸载了“游戏服务”
+
 因为“游戏服务”会在你的 C 盘根目录创建 `XBoxGames` 文件夹和 `.GamingRoot` 文件。按照微软支持社区提供的[解决方案](https://learn.microsoft.com/zh-cn/answers/questions/4334682/xboxgames)，在不玩 XBox 游戏的前提下，卸载“游戏服务”是一种解决方案。但意外的是，它增加了触发 MS Store 的 bug 的概率。
 
 ## 附录
