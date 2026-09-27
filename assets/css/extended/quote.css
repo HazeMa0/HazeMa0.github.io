@@ -1,0 +1,36 @@
+.md-content blockquote {
+    --quote-bg: #f5f6f8;
+    --quote-mark: #9aa4b1;
+    position: relative;
+    margin: 1.25rem 0;
+    padding: 1rem 1.25rem 1rem 3.5rem;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--quote-bg);
+    color: var(--primary);
+}
+
+.md-content blockquote::before {
+    content: "“";
+    position: absolute;
+    inset-block-start: 0.25rem;
+    inset-inline-start: 1rem;
+    color: var(--quote-mark);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 3.5rem;
+    line-height: 1;
+    pointer-events: none;
+}
+
+.md-content blockquote > :first-child {
+    margin-top: 0;
+}
+
+.md-content blockquote > :last-child {
+    margin-bottom: 0;
+}
+
+:root[data-theme="dark"] .md-content blockquote {
+    --quote-bg: #292b30;
+    --quote-mark: #858f9b;
+}
