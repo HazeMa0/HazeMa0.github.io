@@ -1,0 +1,114 @@
+.post-toc-rail {
+    display: none;
+}
+
+.post-toc-inline,
+.post-toc-sidebar {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+:root[data-theme="dark"] .post-toc-inline,
+:root[data-theme="dark"] .post-toc-sidebar {
+    background: var(--entry);
+}
+
+details.post-toc-inline summary,
+.post-toc-title {
+    padding: 0.65rem 1rem;
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.post-toc-inline .title {
+    margin-inline-start: 0.2rem;
+    font-weight: inherit;
+}
+
+.post-toc-title {
+    margin: 0;
+}
+
+.post-toc-inline .inner,
+.post-toc-sidebar nav {
+    margin: 0 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.post-toc-inline ul,
+.post-toc-sidebar ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.post-toc-inline ul ul,
+.post-toc-sidebar ul ul {
+    padding-inline-start: 0;
+}
+
+.post-toc-inline a,
+.post-toc-sidebar a {
+    display: block;
+    padding: 0.35rem 0.75rem;
+    border-inline-start: 2px solid var(--border);
+    color: var(--secondary);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.post-toc-inline ul ul > li > a,
+.post-toc-sidebar ul ul > li > a {
+    padding-inline-start: 1.5rem;
+}
+
+.post-toc-inline ul ul ul > li > a,
+.post-toc-sidebar ul ul ul > li > a {
+    padding-inline-start: 2.25rem;
+}
+
+.post-toc-inline a:hover,
+.post-toc-inline a:focus-visible,
+.post-toc-sidebar a:hover,
+.post-toc-sidebar a:focus-visible {
+    border-inline-start-color: var(--primary);
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.post-toc-inline a[aria-current="location"],
+.post-toc-sidebar a[aria-current="location"] {
+    border-inline-start-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+@media (min-width: 1360px) {
+    .post-single {
+        position: relative;
+    }
+
+    .post-toc-inline {
+        display: none;
+    }
+
+    .post-toc-rail {
+        display: block;
+        position: absolute;
+        inset-block: 0;
+        inset-inline-start: calc(100% + 3.5rem);
+        width: 14rem;
+    }
+
+    .post-toc-sidebar {
+        position: sticky;
+        top: 1.5rem;
+        max-height: calc(100vh - 3rem);
+        overflow-y: auto;
+        font-size: 0.875rem;
+        scrollbar-width: thin;
+    }
+}

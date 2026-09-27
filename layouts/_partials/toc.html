@@ -1,0 +1,17 @@
+{{- $toc := .TableOfContents -}}
+{{- if in $toc "<li>" -}}
+<div class="post-toc-rail">
+  <aside class="post-toc-sidebar" aria-label="文章目录">
+    <p class="post-toc-title">目录</p>
+    {{ $toc }}
+  </aside>
+</div>
+<details class="toc post-toc-inline">
+  <summary accesskey="c" title="(Alt + C)">
+    <span class="title">目录</span>
+  </summary>
+  <div class="inner">
+    {{ replace $toc `id="TableOfContents"` `id="TableOfContentsInline"` | safeHTML }}
+  </div>
+</details>
+{{- end -}}

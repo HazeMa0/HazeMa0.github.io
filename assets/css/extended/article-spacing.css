@@ -1,0 +1,7 @@
+.post-content {
+    line-height: 1.75;
+}
+
+.post-content > p:not(:last-child) {
+    margin-bottom: 0.85em;
+}

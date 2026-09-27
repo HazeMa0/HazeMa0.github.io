@@ -1,0 +1,58 @@
+{{- if .IsPage -}}
+{{- $imageZoom := resources.Get "js/image-zoom.js" | minify | fingerprint -}}
+<script defer src="{{ $imageZoom.RelPermalink }}"></script>
+{{- end -}}
+{{- if and .IsPage (.Param "ShowToc") -}}
+<script>
+(() => {
+    const links = [...document.querySelectorAll(".post-toc-rail nav a, .post-toc-inline nav a")];
+    if (!links.length) return;
+
+    const linksById = new Map();
+    for (const link of links) {
+        const fragment = link.getAttribute("href");
+        if (!fragment || !fragment.startsWith("#")) continue;
+        const id = decodeURIComponent(fragment.slice(1));
+        if (!linksById.has(id)) linksById.set(id, []);
+        linksById.get(id).push(link);
+    }
+
+    const headings = [...linksById.keys()]
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+    if (!headings.length) return;
+
+    let currentId = "";
+    let scheduled = false;
+    function updateCurrentSection() {
+        scheduled = false;
+        let heading = headings[0];
+        for (const candidate of headings) {
+            if (candidate.getBoundingClientRect().top > 140) break;
+            heading = candidate;
+        }
+        if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+            heading = headings[headings.length - 1];
+        }
+        if (heading.id === currentId) return;
+        for (const link of linksById.get(currentId) || []) {
+            link.removeAttribute("aria-current");
+        }
+        for (const link of linksById.get(heading.id) || []) {
+            link.setAttribute("aria-current", "location");
+        }
+        currentId = heading.id;
+    }
+
+    function scheduleUpdate() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(updateCurrentSection);
+    }
+
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+    updateCurrentSection();
+})();
+</script>
+{{- end -}}
