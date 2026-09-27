@@ -8,35 +8,38 @@ summary: '项目地址：https://github.com/HazeMa0/fly-hadoop2-workflow。借�
 
 作为博客，还是整理一下这个过程中的困难吧。
 
-### 一、网络问题很烦人
+## 一、网络问题很烦人
 
 1. 首先，事实是：2024 年，中国大陆的主要高校和云服务商都关闭了 Docker Hub 的镜像源。但是百度仍有大量的帖子在建议更换镜像源以改善对 Docker Hub 的访问。
 
 2. 我在我的 Windows 环境部署了代理。WSL2 理应继承代理设置。但是神奇的事情发生了：WSL2 我们可以顺利地 `docker build`，Windows 却不行。
 
-然后，我们做了以下事情试图让 Dockerfile 的 from 指令正常工作：
- - 设置 HTTP_PROXY 和 HTTPS_PROXY 环境变量；
-> **注意！**
->
-> HTTPS_PROXY 对应的仍然是 http://localhost:1234，而不是 https！我是在发现环境变量使我的 VSCode 无法正常工作时才发现这个问题的；
+   然后，我们做了以下事情试图让 Dockerfile 的 from 指令正常工作：
 
- - 配置 Docker Engine 的配置文件：
-```json
-"proxies": {
-    "default": {
-        "httpProxy": "http://127.0.0.1:9870",
-        "httpsProxy": "http://127.0.0.1:9870",
-        "noProxy": "localhost,127.0.0.1"
-    }
-}
-```
- - 修改 `~/.docker/config.json`（最后又删掉了）
+   - 设置 `HTTP_PROXY` 和 `HTTPS_PROXY` 环境变量；
 
-在我没发现我把 HTTPS_PROXY 写成 https://... 时，这三个修改都不起作用。然后，在一次神秘的 `docker pull ...` 后，突然就好起来了，我至今也没搞清楚到底是怎么回事。
+     > [!WARNING]
+     > `HTTPS_PROXY` 对应的仍然是 `http://localhost:1234`，而不是 `https://...`！我是在发现环境变量使我的 VSCode 无法正常工作时才发现这个问题的；
+
+   - 配置 Docker Engine 的配置文件：
+
+     ```json
+     "proxies": {
+         "default": {
+             "httpProxy": "http://127.0.0.1:9870",
+             "httpsProxy": "http://127.0.0.1:9870",
+             "noProxy": "localhost,127.0.0.1"
+         }
+     }
+     ```
+
+   - 修改 `~/.docker/config.json`（最后又删掉了）
+
+   在我没发现我把 HTTPS_PROXY 写成 https://... 时，这三个修改都不起作用。然后，在一次神秘的 `docker pull ...` 后，突然就好起来了，我至今也没搞清楚到底是怎么回事。
 
 3. 我们认识到，`ping` 命令走的是 ICMP 协议，对测试 http/socks5 的代理没有意义。
 
-### 二、对 Docker 和 Dev Container 的错误理解
+## 二、对 Docker 和 Dev Container 的错误理解
 
 刚开始，我们在使用 Docker 运行和使用 Dev Container 作为开发环境上犹豫和摇摆了很长时间。我问了 AI 下面这一大段文字，可见我当时的烦躁。
 
@@ -59,29 +62,34 @@ Dev Container 相关问题是：
 4. 不知道为什么，让 Dev Container 执行我的脚本时不能正确识别 echo 的 -e 参数，而是将其作为文本打印。最后我们换用了 printf 命令。
 
 
-### 三、一些 linux 知识
+## 三、一些 linux 知识
 
 1. Hadoop 环境初始化脚本需要 ssh 连接，就会产生下面这种需要手动确认的麻烦问题：
-```
-yes：The authenticity of host 'localhost (::1)' can't be established. 
-ECDSA key fingerprint is SHA256:**********.
-Are you sure you want to continue connecting (yes/no)? 
-```
-我们希望初始化脚本作为 Docker 的 1 号进程，当然不希望这种需要手工确认的东西出现。我们最终使用以下脚本解决：
-```sh
-touch ~/.ssh/config
-printf "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n" > ~/.ssh/config
-```
+
+   ```text
+   yes：The authenticity of host 'localhost (::1)' can't be established.
+   ECDSA key fingerprint is SHA256:**********.
+   Are you sure you want to continue connecting (yes/no)?
+   ```
+
+   我们希望初始化脚本作为 Docker 的 1 号进程，当然不希望这种需要手工确认的东西出现。我们最终使用以下脚本解决：
+
+   ```sh
+   touch ~/.ssh/config
+   printf "Host *\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile /dev/null\n" > ~/.ssh/config
+   ```
 
 2. 该死的 `\r\n`
-在 Windows，git 默认会把 `\n` 替换成 `\r\n`。这最后导致我的脚本 push 再 clone 后竟然无法运行了。最后一行命令解决问题：
-```powershell
-git config --global core.autocrlf false
-```
+
+   在 Windows，git 默认会把 `\n` 替换成 `\r\n`。这最后导致我的脚本 push 再 clone 后竟然无法运行了。最后一行命令解决问题：
+
+   ```powershell
+   git config --global core.autocrlf false
+   ```
 
 3. 有趣的事实：JDK 1.x == JDK x
 
-### 四、该死的讲义问题
+## 四、该死的讲义问题
 
 1. 讲义给出的一些命令根本是错误的。
 
@@ -89,7 +97,7 @@ git config --global core.autocrlf false
 
 3. 讲义没告诉我 start-all.sh 的正确位置，让我无法正确配置 PATH。
 
-### 五、鸣谢
+## 五、鸣谢
 
 感谢 DeepSeek 和 ChatGPT 耐心地听我抱怨和提出问题。没有任何一个人类受得了这么多怨气和不满。
 

@@ -1,0 +1,104 @@
+/* Atom One Light palette adapted to Hugo's Chroma token classes.
+   Sources: https://github.com/atom/one-light-syntax/blob/master/styles/colors.less
+            https://github.com/atom/one-light-syntax/blob/master/styles/syntax-variables.less
+   Dark colors follow Atom One Dark: https://github.com/atom/one-dark-syntax */
+:root {
+    --one-code-bg: #fafafa;
+    --one-code-fg: #383a42;
+    --one-code-muted: #a0a1a7;
+    --one-code-purple: #a626a4;
+    --one-code-blue: #4078f2;
+    --one-code-cyan: #0184bb;
+    --one-code-green: #50a14f;
+    --one-code-red: #e45649;
+    --one-code-orange: #986801;
+    --one-code-yellow: #c18401;
+    --one-code-highlight: #e8e9ed;
+    --one-code-border: #e1e3e8;
+    --code-block-bg: var(--one-code-bg);
+}
+
+:root[data-theme="dark"] {
+    --one-code-bg: #282c34;
+    --one-code-fg: #abb2bf;
+    --one-code-muted: #7f848e;
+    --one-code-purple: #c678dd;
+    --one-code-blue: #61afef;
+    --one-code-cyan: #56b6c2;
+    --one-code-green: #98c379;
+    --one-code-red: #e06c75;
+    --one-code-orange: #d19a66;
+    --one-code-yellow: #e5c07b;
+    --one-code-highlight: #3e4451;
+    --one-code-border: #3e4451;
+    --code-block-bg: var(--one-code-bg);
+}
+
+/* Keep the pale block visible against PaperMod's white page. */
+.md-content .highlight:not(table),
+.md-content pre:not(.chroma) {
+    border: 1px solid var(--one-code-border);
+}
+
+/* PaperMod sets a fixed pale text color on code blocks. */
+.md-content pre code,
+.chroma {
+    color: var(--one-code-fg);
+}
+
+/* Replace PaperMod's bundled Chroma colors before assigning this palette. */
+.chroma [class] {
+    color: inherit;
+    background-color: transparent;
+    font-style: normal;
+    font-weight: normal;
+}
+
+.chroma :is(.c, .ch, .cm, .c1, .cs, .cp, .cpf, .sd, .sh, .go) {
+    color: var(--one-code-muted);
+    font-style: italic;
+}
+
+.chroma :is(.k, .kd, .kn, .kp, .kr, .ow) {
+    color: var(--one-code-purple);
+}
+
+.chroma :is(.nf, .fm, .nd, .nl, .nn, .gu) {
+    color: var(--one-code-blue);
+}
+
+.chroma :is(.s, .sa, .sb, .sc, .dl, .s2, .se, .si, .sx, .s1, .ss, .gi) {
+    color: var(--one-code-green);
+}
+
+.chroma :is(.m, .mb, .mf, .mh, .mi, .il, .mo, .kc, .no, .nb, .bp, .na) {
+    color: var(--one-code-orange);
+}
+
+.chroma :is(.nc, .kt) {
+    color: var(--one-code-yellow);
+}
+
+.chroma :is(.o, .ni, .sr) {
+    color: var(--one-code-cyan);
+}
+
+.chroma :is(.nt, .nv, .vc, .vg, .vi, .vm, .ne, .gd, .gh, .gt, .gr, .err) {
+    color: var(--one-code-red);
+}
+
+.chroma :is(.lnt, .ln) {
+    color: var(--one-code-muted);
+}
+
+.chroma .hl {
+    background-color: var(--one-code-highlight);
+}
+
+.chroma :is(.gs, .gh, .gu) {
+    font-weight: bold;
+}
+
+.chroma .ge {
+    font-style: italic;
+}

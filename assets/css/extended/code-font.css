@@ -1,0 +1,22 @@
+/* Self-hosted JetBrains Mono; the license is in static/fonts/OFL.txt. */
+@font-face {
+    font-family: "JetBrains Mono Web";
+    font-style: normal;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url("/fonts/jetbrains-mono-latin.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "JetBrains Mono Web";
+    font-style: italic;
+    font-weight: 100 800;
+    font-display: swap;
+    src: url("/fonts/jetbrains-mono-latin-italic.woff2") format("woff2");
+}
+
+.md-content code,
+.md-content pre {
+    font-family: "JetBrains Mono Web", "SFMono-Regular", Consolas,
+        "Liberation Mono", Menlo, "Noto Sans Mono CJK SC", monospace;
+}
